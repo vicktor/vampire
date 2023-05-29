@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="health_permissions">
+        <item>androidx.health.permission.BloodGlucose.READ</item>
+        <item>androidx.health.permission.BloodGlucose.WRITE</item>
+    </array>
+</resources>
