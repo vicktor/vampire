@@ -21,13 +21,13 @@ import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.TimeZone
 
-class UiBasedCollector : NotificationListenerService() {
+class VampireCollector : NotificationListenerService() {
     @VisibleForTesting
     var lastPackage: String? = null
     override fun onCreate() {
         super.onCreate()
         mContext = applicationContext
-        Log.d("vampire", "onCreate UiBasedCollector: NotificationListenerService ")
+        Log.d("vampire", "onCreate: NotificationListenerService ")
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
@@ -245,7 +245,7 @@ class UiBasedCollector : NotificationListenerService() {
     */
 
     companion object {
-        private const val TAG = "vampire" // UiBasedCollector.class.getSimpleName();
+        private const val TAG = "vampire"
         private const val UI_BASED_STORE_LAST_VALUE = "UI_BASED_STORE_LAST_VALUE"
         private const val UI_BASED_STORE_LAST_REPEAT = "UI_BASED_STORE_LAST_REPEAT"
         private const val ENABLED_NOTIFICATION_LISTENERS = "enabled_notification_listeners"

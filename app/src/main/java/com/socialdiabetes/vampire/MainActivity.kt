@@ -1,6 +1,5 @@
 package com.socialdiabetes.vampire
 
-import android.app.Activity
 import android.content.ComponentName
 import android.content.Intent
 import android.net.Uri
@@ -15,7 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.BloodGlucoseRecord
-import com.socialdiabetes.vampire.services.UiBasedCollector
+import com.socialdiabetes.vampire.services.VampireCollector
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -39,7 +38,7 @@ class MainActivity : ComponentActivity() {
         val healthConnectManager = (application as BaseApplication).healthConnectManager
 
         val availability by healthConnectManager.availability
-        val cn = ComponentName(this, UiBasedCollector::class.java)
+        val cn = ComponentName(this, VampireCollector::class.java)
         val flat = Settings.Secure.getString(
             this.getContentResolver(),
             "enabled_notification_listeners"

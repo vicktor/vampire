@@ -41,8 +41,8 @@
 
 
         <service
-            android:name=".services.UiBasedCollector"
-            android:label="UiBasedCollector"
+            android:name=".services.VampireCollector"
+            android:label="VampireCollector"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
             android:exported="true">
             <intent-filter>
