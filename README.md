@@ -12,15 +12,15 @@ Based on the great [xDrip](https://github.com/NightscoutFoundation/xDrip) projec
 
 App needs special permission to read your notifications, you can inspect the code for your security.
 
-Go to Settings -> Accesibility -> Notifications and allow **vampire** to access your notifications, allow all
+Go to Settings -> Accessibility -> Notifications and allow **vampire** to access your notifications, allow all
 
 ## Reading data with WebServer
 
-Open http://localhost:5566/glucoses to read last 24 hours of glucoses
+Open http://localhost:5566/glucoses from your app to read last 24 hours of glucoses
 
-Open http://localhost:5566/glucose to read last glucose
+Open http://localhost:5566/glucose from your app to read last glucose value
 
-All data are returned in json:
+All data are returned in JSON:
 
 ```json
 { 
