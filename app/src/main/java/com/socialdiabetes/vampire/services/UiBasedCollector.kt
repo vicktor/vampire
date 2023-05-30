@@ -14,12 +14,13 @@ import android.widget.ImageView
 import android.widget.RemoteViews
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
-import com.socialdiabetes.vampire.HealthConnectManager
+import com.socialdiabetes.vampire.BaseApplication
+import com.socialdiabetes.vampire.DatabaseManager
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import java.util.Calendar
+import java.util.TimeZone
 
-/**
- * JamOrHam
- * UI Based Collector
- */
 class UiBasedCollector : NotificationListenerService() {
     @VisibleForTesting
     var lastPackage: String? = null
@@ -120,8 +121,22 @@ class UiBasedCollector : NotificationListenerService() {
             Log.d(TAG, "Found specific value: $mgdl")
             if (mgdl >= 40 && mgdl <= 405) {
                 Log.e("vampire", "glucose reading $mgdl")
-                val healthConnectManager = HealthConnectManager(mContext!!)
-                healthConnectManager.writeGlucose(0.0.toFloat(), 1)
+                val healthConnectManager = (application as BaseApplication).healthConnectManager
+                var databaseManager = mContext?.let { DatabaseManager(it) }
+
+                databaseManager?.insertGlucoseRecord(
+                    tsl(),
+                    getTimeOffset(),
+                    mgdl.toDouble(),
+                    "mgdl",
+                    "interstitial",
+                    "flat",
+                    "Dexcom"
+                )
+
+                GlobalScope.launch {
+                    healthConnectManager.writeGlucose(mgdl.toDouble(), 1)
+                }
 
 
                 /*
@@ -154,29 +169,15 @@ class UiBasedCollector : NotificationListenerService() {
         //texts.clear();
     }
 
-    /*
+    private fun getTimeOffset(): Long {
+        val calendar = Calendar.getInstance()
+        val timeZone = TimeZone.getDefault()
+        val offsetInMillis = timeZone.getOffset(calendar.timeInMillis)
+        val offsetInMinutes = offsetInMillis / (60 * 1000)
+        return offsetInMinutes.toLong()
 
-    public static long msSince(long when) {
-        return (tsl() - when);
     }
 
-    static boolean isValidMmol(final String text) {
-        return text.matches("[0-9]+[.,][0-9]+");
-    }
-
-    private boolean isJammed(final int mgdl) {
-        long previousValue = PersistentStore.getLong(mContext, UI_BASED_STORE_LAST_VALUE);
-        if (previousValue == mgdl) {
-            PersistentStore.incrementLong(mContext, UI_BASED_STORE_LAST_REPEAT);
-        } else {
-            PersistentStore.setLong(mContext, UI_BASED_STORE_LAST_REPEAT, 0);
-        }
-        Long lastRepeat = PersistentStore.getLong(mContext, UI_BASED_STORE_LAST_REPEAT);
-        Log.d(TAG, "Last repeat: " + lastRepeat);
-        return lastRepeat > 3;
-    }
-
-     */
     private fun getTextViews(output: MutableList<TextView>, parent: ViewGroup) {
         val children = parent.childCount
         for (i in 0 until children) {
@@ -184,7 +185,7 @@ class UiBasedCollector : NotificationListenerService() {
             if (view.visibility == View.VISIBLE) {
                 if (view is ImageView) {
                     Log.d("vampire", "hemos encontrado una imagen")
-                    Log.d("vampimre", view.toString())
+                    Log.d("vampire", view.toString())
                 }
                 if (view is TextView) {
                     output.add(view)
@@ -193,6 +194,7 @@ class UiBasedCollector : NotificationListenerService() {
                 }
             }
         }
+
     } /*
     public static void onEnableCheckPermission(final Activity activity) {
         if (DexCollectionType.getDexCollectionType() == UiBased) {
@@ -267,6 +269,7 @@ class UiBasedCollector : NotificationListenerService() {
         }
 
         var mContext: Context? = null
+
         private fun tsl(): Long {
             return System.currentTimeMillis()
         }

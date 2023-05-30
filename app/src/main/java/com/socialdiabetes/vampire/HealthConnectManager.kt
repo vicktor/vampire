@@ -1,25 +1,64 @@
 package com.socialdiabetes.vampire
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.os.Build
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContract
-import androidx.health.connect.client.HealthConnectClient
-import androidx.health.connect.client.HealthConnectClient.Companion.SDK_UNAVAILABLE
-import androidx.health.connect.client.PermissionController
 import androidx.compose.runtime.mutableStateOf
+import androidx.health.connect.client.HealthConnectClient
+import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.records.BloodGlucoseRecord
+import androidx.health.connect.client.records.BloodGlucoseRecord.Companion.RELATION_TO_MEAL_GENERAL
+import androidx.health.connect.client.records.BloodGlucoseRecord.Companion.SPECIMEN_SOURCE_INTERSTITIAL_FLUID
+import androidx.health.connect.client.records.MealType
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
+import androidx.health.connect.client.units.BloodGlucose
+import androidx.health.connect.client.records.metadata.Metadata
 import java.time.Instant
+import java.time.ZonedDateTime
+import java.util.LinkedList
+
 
 const val MIN_SUPPORTED_SDK = Build.VERSION_CODES.O_MR1
 
 
 class HealthConnectManager(private val context: Context) {
     private val healthConnectClient by lazy { HealthConnectClient.getOrCreate(context) }
+
+    var availability = mutableStateOf(HealthConnectAvailability.NOT_SUPPORTED)
+        private set
+
+    init {
+        checkAvailability()
+    }
+
+    fun checkAvailability() {
+        availability.value = when {
+            HealthConnectClient.isProviderAvailable(context) -> HealthConnectAvailability.INSTALLED
+            isSupported() -> HealthConnectAvailability.NOT_INSTALLED
+            else -> HealthConnectAvailability.NOT_SUPPORTED
+        }
+    }
+
+
+    /**
+     * Determines whether all the specified permissions are already granted. It is recommended to
+     * call [PermissionController.getGrantedPermissions] first in the permissions flow, as if the
+     * permissions are already granted then there is no need to request permissions via
+     * [PermissionController.createRequestPermissionResultContract].
+     */
+    suspend fun hasAllPermissions(permissions: Set<String>): Boolean {
+        return healthConnectClient.permissionController.getGrantedPermissions().containsAll(permissions)
+    }
+
+    fun requestPermissionsActivityContract(): ActivityResultContract<Set<String>, Set<String>> {
+        return PermissionController.createRequestPermissionResultContract()
+    }
 
     val healthConnectCompatibleApps by lazy {
         val intent = Intent("androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE")
@@ -39,7 +78,7 @@ class HealthConnectManager(private val context: Context) {
         packages.associate {
             val icon = try {
                 context.packageManager.getApplicationIcon(it.activityInfo.packageName)
-            } catch (e: Resources.NotFoundException) {
+            } catch(e: Resources.NotFoundException) {
                 null
             }
             val label = context.packageManager.getApplicationLabel(it.activityInfo.applicationInfo)
@@ -53,35 +92,56 @@ class HealthConnectManager(private val context: Context) {
         }
     }
 
-    var availability = mutableStateOf(SDK_UNAVAILABLE)
-        private set
-
-    fun checkAvailability() {
-        availability.value = HealthConnectClient.sdkStatus(context)
-    }
-
-    init {
-        checkAvailability()
-    }
-
-    suspend fun hasAllPermissions(permissions: Set<String>): Boolean {
-        return healthConnectClient.permissionController.getGrantedPermissions().containsAll(permissions)
-    }
-
-    fun requestPermissionsActivityContract(): ActivityResultContract<Set<String>, Set<String>> {
-        return PermissionController.createRequestPermissionResultContract()
-    }
-
     suspend fun revokeAllPermissions(){
         healthConnectClient.permissionController.revokeAllPermissions()
     }
 
+    suspend fun writeGlucose(value: Double, units: Int) {
+
+        val time = ZonedDateTime.now().withNano(0)
+/*
+        var glucose = BloodGlucose(110.0, BloodGlucose.Type.MILLIGRAMS_PER_DECILITER)
+
+            //.milligramsPerDeciliter(111.0)
+        var lectura = BloodGlucoseRecord(
+            level = glucose,
+            specimenSource = SPECIMEN_SOURCE_INTERSTITIAL_FLUID,
+            mealType = MealType.MEAL_TYPE_UNKNOWN,
+            time = time.toInstant(),
+            zoneOffset = time.offset,
+        )
+*/
+
+        Log.d("vampire", "guaradando glucosa en mmol "+roundToDecimal(value/18))
+        val list = LinkedList<BloodGlucoseRecord>()
+        val record = BloodGlucoseRecord(
+            time.toInstant(),
+            time.offset,
+            //BloodGlucose.milligramsPerDeciliter(value),
+            BloodGlucose.millimolesPerLiter(roundToDecimal(value/18)),
+            SPECIMEN_SOURCE_INTERSTITIAL_FLUID,
+            MealType.MEAL_TYPE_UNKNOWN, RELATION_TO_MEAL_GENERAL,
+            Metadata()
+        )
+        list.add(record)
+
+        healthConnectClient.insertRecords(list)
+    }
+
+    fun roundToDecimal(number: Double): Double {
+        return "%.1f".format(number).replace(",",".").toDouble()
+    }
+
+    /*
     suspend fun writeGlucose(glucose: BloodGlucoseRecord) {
         val records = listOf(glucose)
         healthConnectClient.insertRecords(records)
     }
 
-    suspend fun readGlucoses(start: Instant, end: Instant): List<BloodGlucoseRecord> {
+     */
+
+
+    suspend fun readGlucose(start: Instant, end: Instant): List<BloodGlucoseRecord> {
         val request = ReadRecordsRequest(
             recordType = BloodGlucoseRecord::class,
             timeRangeFilter = TimeRangeFilter.between(start, end)
@@ -89,4 +149,13 @@ class HealthConnectManager(private val context: Context) {
         val response = healthConnectClient.readRecords(request)
         return response.records
     }
+
+    private fun isSupported() = Build.VERSION.SDK_INT >= MIN_SUPPORTED_SDK
+
+}
+
+enum class HealthConnectAvailability {
+    INSTALLED,
+    NOT_INSTALLED,
+    NOT_SUPPORTED
 }

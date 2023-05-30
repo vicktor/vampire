@@ -1,18 +1,12 @@
 package com.socialdiabetes.vampire.services;
 
-import android.app.Activity;
-import android.app.Application;
 import android.app.Notification;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.IBinder;
-import android.provider.Settings;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,23 +16,12 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
-import androidx.health.connect.client.records.BloodGlucoseRecord;
-import androidx.health.connect.client.records.MealType;
-import androidx.health.connect.client.units.BloodGlucose;
-
 
 import com.socialdiabetes.vampire.HealthConnectManager;
-import com.socialdiabetes.vampire.PersistentStore;
 
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-
-import com.socialdiabetes.vampire.BaseApplication;
-
-import kotlinx.coroutines.GlobalScope;
-import androidx.health.connect.client.records.BloodGlucoseRecord.*
 
 
 /**
@@ -46,7 +29,7 @@ import androidx.health.connect.client.records.BloodGlucoseRecord.*
  * UI Based Collector
  */
 
-public class UiBasedCollector extends NotificationListenerService {
+public class VampireCollector extends NotificationListenerService {
 
     private static final String TAG = "vampire"; // UiBasedCollector.class.getSimpleName();
     private static final String UI_BASED_STORE_LAST_VALUE = "UI_BASED_STORE_LAST_VALUE";
@@ -180,10 +163,6 @@ public class UiBasedCollector extends NotificationListenerService {
             if ((mgdl >= 40 && mgdl <= 405)) {
                 Log.e("vampire", "glucose reading "+mgdl);
 
-                HealthConnectManager healthConnectManager = new HealthConnectManager(mContext);
-
-
-                healthConnectManager.writeGlucose(0.0, 1);
 
 
                 /*

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.healthconnect.codelab.data
+package com.socialdiabetes.vampire
 
 import java.time.Duration
 import java.time.Instant
