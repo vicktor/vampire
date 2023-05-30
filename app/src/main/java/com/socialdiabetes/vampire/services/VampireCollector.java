@@ -22,13 +22,23 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import androidx.health.connect.client.records.BloodGlucoseRecord;
+import androidx.health.connect.client.records.MealType;
+import androidx.health.connect.client.units.BloodGlucose;
 
 
+import com.socialdiabetes.vampire.HealthConnectManager;
 import com.socialdiabetes.vampire.PersistentStore;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+
+import com.socialdiabetes.vampire.BaseApplication;
+
+import kotlinx.coroutines.GlobalScope;
+import androidx.health.connect.client.records.BloodGlucoseRecord.*
 
 
 /**
@@ -159,12 +169,23 @@ public class UiBasedCollector extends NotificationListenerService {
         } else if (matches > 1) {
             Log.e(TAG, "Found too many matches: " + matches);
         } else {
+
+
+            // HealthConnectManager healthConnectManager = (mContext)BaseApplication.healthConnectManager;
+
             // Sensor.createDefaultIfMissing();
             Long timestamp = tsl();
             Log.d(TAG, "Found specific value: " + mgdl);
 
             if ((mgdl >= 40 && mgdl <= 405)) {
                 Log.e("vampire", "glucose reading "+mgdl);
+
+                HealthConnectManager healthConnectManager = new HealthConnectManager(mContext);
+
+
+                healthConnectManager.writeGlucose(0.0, 1);
+
+
                 /*
                 val grace = DexCollectionType.getCurrentSamplePeriod() * 4;
                 val recent = msSince(lastReadingTimestamp) < grace;
