@@ -1,3 +1,1 @@
-# vampire
-
-# Delighted to suck your glucoses
+# vampire | Delighted to suck your glucoses
