@@ -176,9 +176,10 @@ class VampireCollector : NotificationListenerService() {
                         vectorDrawable.setBounds(0, 0, canvas.width, canvas.height)
                         vectorDrawable.draw(canvas)
 
-                        // Codifica el Bitmap en una matriz de bytes
                         val stream = ByteArrayOutputStream()
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, stream)                    }
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, stream)
+                    }
+
                     if (drawable is BitmapDrawable) {
                         val bitmap = (drawable as BitmapDrawable).bitmap
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 80, stream)
