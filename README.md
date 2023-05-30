@@ -3,7 +3,7 @@
 ###### _Give me back my **fucking data**_
 
 
-Read glucose from notifications and **share** it with **anyone** through internal WebServer or ContentProvider.
+Read glucose from notifications and **share** it with **anyone** through internal WebServer, ContentProvider and optionally if you wish, all the information can be written in Google [Healht Connect](https://developer.android.com/guide/health-and-fitness/health-connect).
 
 Based on the great [xDrip](https://github.com/NightscoutFoundation/xDrip) project without which, **vampire** would not exist.
 
