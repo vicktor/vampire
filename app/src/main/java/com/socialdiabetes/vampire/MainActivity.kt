@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 class MainActivity : ComponentActivity() {
 
@@ -101,12 +102,14 @@ class MainActivity : ComponentActivity() {
 
             } else {
                 findViewById<TextView>(R.id.glucose).text = last_glucosa?.glucoseValue.toString()
-                findViewById<TextView>(R.id.units).text = "mmol"
+                findViewById<TextView>(R.id.units).text = "mmol/L"
             }
             val sdf = SimpleDateFormat("dd-MM HH:mm", Locale.getDefault())
 
             findViewById<TextView>(R.id.trend).text = last_glucosa.trend
-            findViewById<TextView>(R.id.fecha).text = sdf.format(last_glucosa.timestamp)
+            findViewById<TextView>(R.id.fecha).text = getReadableTimeDiff(last_glucosa.timestamp)
+
+                // sdf.format(last_glucosa.timestamp)
         }
 
     }
@@ -119,5 +122,22 @@ class MainActivity : ComponentActivity() {
     fun requestPermissionsActivityContract(): ActivityResultContract<Set<String>, Set<String>> {
         val healthConnectManager = (application as BaseApplication).healthConnectManager
         return PermissionController.createRequestPermissionResultContract()
+    }
+
+
+    fun getReadableTimeDiff(timestamp: Long): String {
+        val diff = System.currentTimeMillis() - timestamp
+
+        val days = TimeUnit.MILLISECONDS.toDays(diff)
+        if (days > 0) return "$days día(s)"
+
+        val hours = TimeUnit.MILLISECONDS.toHours(diff).toInt()
+        if (hours == 1) return "$hours hora" else if (hours > 1) return "$hours horas"
+
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(diff).toInt()
+        if (minutes == 1) return "$minutes minuto" else if (minutes > 1) return "$minutes minutos"
+
+        val seconds = TimeUnit.MILLISECONDS.toSeconds(diff)
+        return "$seconds segundos"
     }
 }

@@ -3,6 +3,10 @@ package com.socialdiabetes.vampire.services
 import android.app.Notification
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.VectorDrawable
 import android.os.Build
 import android.os.IBinder
 import android.service.notification.NotificationListenerService
@@ -18,6 +22,8 @@ import com.socialdiabetes.vampire.BaseApplication
 import com.socialdiabetes.vampire.DatabaseManager
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
+import java.security.MessageDigest
 import java.util.Calendar
 import java.util.TimeZone
 
@@ -152,6 +158,42 @@ class VampireCollector : NotificationListenerService() {
             if (view.visibility == View.VISIBLE) {
                 if (view is ImageView) {
                     Log.d(TAG, "hemos encontrado una imagen ID: "+view.id.toString())
+
+                    val drawable = view.drawable
+                    val stream = ByteArrayOutputStream()
+
+                    if (drawable is VectorDrawable) {
+                        val vectorDrawable = drawable as VectorDrawable
+                        // Crea un Bitmap del tamaño correcto
+                        val bitmap = Bitmap.createBitmap(
+                            vectorDrawable.intrinsicWidth,
+                            vectorDrawable.intrinsicHeight,
+                            Bitmap.Config.ARGB_8888
+                        )
+
+                        // Dibuja el VectorDrawable en el Bitmap
+                        val canvas = Canvas(bitmap)
+                        vectorDrawable.setBounds(0, 0, canvas.width, canvas.height)
+                        vectorDrawable.draw(canvas)
+
+                        // Codifica el Bitmap en una matriz de bytes
+                        val stream = ByteArrayOutputStream()
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, stream)                    }
+                    if (drawable is BitmapDrawable) {
+                        val bitmap = (drawable as BitmapDrawable).bitmap
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, stream)
+                    }
+
+                    // Codifica el Bitmap en una matriz de bytes
+                    val bitmapBytes = stream.toByteArray()
+
+                    // Calcula el hash SHA-256
+                    val digest = MessageDigest.getInstance("SHA-256")
+                    val hash = digest.digest(bitmapBytes)
+
+                    // Convierte el hash a una cadena hexadecimal para una fácil visualización
+                    val hexHash = hash.joinToString("") { "%02x".format(it) }
+                    Log.d(TAG, "hemos encontrado una imagen SHA: $hexHash")
 
                     /*
                     1 - DOUBLE_UP ↑↑
