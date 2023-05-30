@@ -105,6 +105,7 @@ class MainActivity : ComponentActivity() {
             }
             val sdf = SimpleDateFormat("dd-MM HH:mm", Locale.getDefault())
 
+            findViewById<TextView>(R.id.trend).text = last_glucosa.trend
             findViewById<TextView>(R.id.fecha).text = sdf.format(last_glucosa.timestamp)
         }
 
