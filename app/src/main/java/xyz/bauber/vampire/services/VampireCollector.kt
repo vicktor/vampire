@@ -239,7 +239,7 @@ class VampireCollector : NotificationListenerService() {
         if (lastGlucose != null) {
             val time_elapsed = time - lastGlucose.timestamp
             val minutes = TimeUnit.MILLISECONDS.toMinutes(time_elapsed).toInt()
-            val diff = lastGlucose.glucoseValue - mgdl
+            val diff = mgdl - lastGlucose.glucoseValue
             if (minutes > 0) {
                 val slope = diff / minutes
 
@@ -248,11 +248,11 @@ class VampireCollector : NotificationListenerService() {
                 Log.d(TAG, "slope glucose: " + slope)
                 if (minutes < 6) {
                     if (slope > 3) trend = "DOUBLE_UP"
-                    if (slope in 2.0..3.0) trend = "SINGLE_UP"
-                    if (slope in 1.0..2.0) trend = "UP_45"
+                    if (slope in 2.1..3.0) trend = "SINGLE_UP"
+                    if (slope in 1.1..2.0) trend = "UP_45"
                     if (slope in -1.0..1.0) trend = "FLAT"
-                    if (slope in -2.0..-1.0) trend = "DOWN_45"
-                    if (slope in -3.0..-2.0) trend = "SINGLE_DOWN"
+                    if (slope in -2.0..-1.1) trend = "DOWN_45"
+                    if (slope in -3.0..-2.1) trend = "SINGLE_DOWN"
                     if (slope < -3) trend = "DOUBLE_DOWN"
                 }
             } else {
