@@ -63,6 +63,7 @@
         android:text=""
         android:textSize="40dp"
         android:textColor="#000"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/glucose"
         app:layout_constraintStart_toEndOf="@+id/glucose"
         app:layout_constraintTop_toTopOf="@+id/glucose" />

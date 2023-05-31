@@ -1,9 +1,12 @@
 package xyz.bauber.vampire
 
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
 import android.provider.Settings
 import android.util.Log
 import android.widget.TextView
@@ -14,17 +17,17 @@ import androidx.compose.runtime.getValue
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.BloodGlucoseRecord
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import xyz.bauber.vampire.database.DatabaseManager
+import xyz.bauber.vampire.database.GlucoseRecord
 import xyz.bauber.vampire.health.HealthConnectAvailability
 import xyz.bauber.vampire.services.VampireCollector
 import xyz.bauber.vampire.webserver.WebServer
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import xyz.bauber.vampire.database.GlucoseRecord
 import java.text.SimpleDateFormat
-
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+
 
 class MainActivity : ComponentActivity() {
 
@@ -81,6 +84,7 @@ class MainActivity : ComponentActivity() {
         val permsIntent = PermissionController.createRequestPermissionResultContract().createIntent(this, permissions);
         startActivityForResult(permsIntent, HEALTH_CONNECT_RESPONSE_ID);
 
+        checkBattery()
 
         server = WebServer()
         try {
@@ -89,6 +93,28 @@ class MainActivity : ComponentActivity() {
             e.printStackTrace()
         }
 
+    }
+
+    fun checkBattery() {
+        if (!isIgnoringBatteryOptimizations(this) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val name = resources.getString(R.string.app_name)
+            Toast.makeText(applicationContext, "Battery optimization -> All apps -> $name -> Don't optimize", Toast.LENGTH_LONG).show()
+
+            val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+            startActivity(intent)
+        }
+    }
+
+    /**
+     * return true if in App's Battery settings "Not optimized" and false if "Optimizing battery use"
+     */
+    fun isIgnoringBatteryOptimizations(context: Context): Boolean {
+        val pwrm = context.applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
+        val name = context.applicationContext.packageName
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return pwrm.isIgnoringBatteryOptimizations(name)
+        }
+        return true
     }
 
     override fun onResume() {
