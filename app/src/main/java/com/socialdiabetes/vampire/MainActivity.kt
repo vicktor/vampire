@@ -106,10 +106,20 @@ class MainActivity : ComponentActivity() {
             }
             val sdf = SimpleDateFormat("dd-MM HH:mm", Locale.getDefault())
 
-            findViewById<TextView>(R.id.trend).text = last_glucosa.trend
+            val trend = when(last_glucosa.trend) {
+                "DOUBLE_UP" -> "↑↑"
+                "SINGLE_UP" -> "↑"
+                "UP_45" -> "↗"
+                "FLAT" -> "→"
+                "DOWN_45" -> "↘"
+                "SINGLE_DOWN" -> "↓"
+                "DOUBLE_DOWN" -> "↓↓"
+                else -> "?"
+            }
+
+            findViewById<TextView>(R.id.trend).text = trend
             findViewById<TextView>(R.id.fecha).text = getReadableTimeDiff(last_glucosa.timestamp)
 
-                // sdf.format(last_glucosa.timestamp)
         }
 
     }

@@ -20,12 +20,14 @@ import android.widget.TextView
 import androidx.annotation.VisibleForTesting
 import com.socialdiabetes.vampire.BaseApplication
 import com.socialdiabetes.vampire.DatabaseManager
+import com.socialdiabetes.vampire.GlucoseRecord
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.security.MessageDigest
 import java.util.Calendar
 import java.util.TimeZone
+import java.util.concurrent.TimeUnit
 
 class VampireCollector : NotificationListenerService() {
     @VisibleForTesting
@@ -117,13 +119,24 @@ class VampireCollector : NotificationListenerService() {
             Log.e(TAG, "Found too many matches: $matches")
         } else if (matches == 1) {
             Log.d(TAG, "Found glucose: $mgdl")
-            if (mgdl in 30..405) {
+            if (mgdl in 30..450) {
                 Log.e(TAG, "glucose reading $mgdl")
                 val healthConnectManager = (application as BaseApplication).healthConnectManager
                 var databaseManager = mContext?.let { DatabaseManager(it) }
 
+
+                val time = tsl()
+                val lastGlucose = databaseManager?.getLastGlucose()
+                current_trend = "UNKNOWN"
+
+                if (lastGlucose != null) {
+                    current_trend = getTrend(lastGlucose, time, mgdl)
+                }
+
+                Log.d(TAG, current_trend)
+
                 databaseManager?.insertGlucoseRecord(
-                    tsl(),
+                    time,
                     getTimeOffset(),
                     mgdl.toDouble(),
                     "mgdl",
@@ -135,9 +148,6 @@ class VampireCollector : NotificationListenerService() {
                 GlobalScope.launch {
                     healthConnectManager.writeGlucose(mgdl.toDouble(), 1)
                 }
-
-            } else {
-                Log.wtf(TAG, "Glucose value outside acceptable range: $mgdl")
             }
         }
     }
@@ -158,7 +168,7 @@ class VampireCollector : NotificationListenerService() {
             if (view.visibility == View.VISIBLE) {
                 if (view is ImageView) {
                     Log.d(TAG, "hemos encontrado una imagen ID: "+view.id.toString())
-
+/*
                     val drawable = view.drawable
                     val stream = ByteArrayOutputStream()
 
@@ -196,17 +206,9 @@ class VampireCollector : NotificationListenerService() {
                     val hexHash = hash.joinToString("") { "%02x".format(it) }
                     Log.d(TAG, "hemos encontrado una imagen SHA: $hexHash")
 
-                    /*
-                    1 - DOUBLE_UP ↑↑
-                    2 - SINGLE_UP ↑
-                    3 - UP_45 ↗
-                    4 - FLAT →
-                    5 - DOWN_45 ↘
-                    6 - SINGLE_DOWN ↓
-                    7 - DOUBLE_DOWN ↓↓
-                    */
 
                     current_trend = "UNKNOWN"
+
 
                     if (view.id.equals(2131297229)) {
                         Log.d(TAG, "TREND: FLAT → ")
@@ -214,7 +216,7 @@ class VampireCollector : NotificationListenerService() {
                     } else {
                         current_trend = view.id.toString()
                     }
-
+*/
                 }
                 if (view is TextView) {
                     output.add(view)
@@ -224,6 +226,43 @@ class VampireCollector : NotificationListenerService() {
             }
         }
 
+    }
+
+    private fun getTrend(lastGlucose: GlucoseRecord, time: Long, mgdl: Int) : String {
+        var trend = "UNKNOWN"
+        /*
+            1 - DOUBLE_UP ↑↑        increasing >3 mg/dL/min
+            2 - SINGLE_UP ↑         increasing 2-3 mg/dL/min
+            3 - UP_45 ↗             increasing 1-2 mg/dL/min
+            4 - FLAT →              not increasing/decreasing > 1 mg/dL/min
+            5 - DOWN_45 ↘           decreasing 1-2 mg/dL/min
+            6 - SINGLE_DOWN ↓       decreasing 2-3 mg/dL/min
+            7 - DOUBLE_DOWN ↓↓      decreasing >3 mg/dL/min
+            */
+
+        Log.d(TAG, "Last glucose: "+lastGlucose.glucoseValue)
+        Log.d(TAG, "Current glucose: "+mgdl)
+        if (lastGlucose != null) {
+            val time_elapsed = time - lastGlucose.timestamp
+            val minutes = TimeUnit.MILLISECONDS.toMinutes(time_elapsed).toInt()
+            val diff = lastGlucose.glucoseValue - mgdl
+            val slope = diff / minutes
+
+            Log.d(TAG, "minutes: "+minutes)
+            Log.d(TAG, "diff glucose: "+diff)
+            Log.d(TAG, "slope glucose: "+slope)
+            if (minutes < 6) {
+                if (slope > 3) trend = "DOUBLE_UP"
+                if (slope in 2.0..3.0) trend = "SINGLE_UP"
+                if (slope in 1.0..2.0) trend = "UP_45"
+                if (slope in -1.0..1.0) trend = "FLAT"
+                if (slope in -2.0..-1.0) trend = "DOWN_45"
+                if (slope in -3.0..-2.0) trend = "SINGLE_DOWN"
+                if (slope < -3) trend = "DOUBLE_DOWN"
+            }
+
+        }
+        return trend
     }
 
     companion object {
@@ -252,5 +291,7 @@ class VampireCollector : NotificationListenerService() {
         private fun tsl(): Long {
             return System.currentTimeMillis()
         }
+
+
     }
 }
