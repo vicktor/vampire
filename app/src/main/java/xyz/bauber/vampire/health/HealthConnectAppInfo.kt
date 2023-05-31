@@ -1,4 +1,4 @@
-package com.socialdiabetes.vampire
+package xyz.bauber.vampire.health
 
 import android.graphics.drawable.Drawable
 

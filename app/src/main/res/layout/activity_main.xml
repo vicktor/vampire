@@ -5,13 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#fafafa"
-    tools:context=".MainActivity">
+    tools:context="xyz.bauber.vampire.MainActivity">
 
     <TextView
         android:id="@+id/glucose"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="128"
+        android:text="?"
         android:textColor="#000"
         android:textSize="48dp"
         android:textStyle="bold"

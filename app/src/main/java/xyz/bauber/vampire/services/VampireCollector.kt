@@ -1,12 +1,8 @@
-package com.socialdiabetes.vampire.services
+package xyz.bauber.vampire.services
 
 import android.app.Notification
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.VectorDrawable
 import android.os.Build
 import android.os.IBinder
 import android.service.notification.NotificationListenerService
@@ -18,13 +14,11 @@ import android.widget.ImageView
 import android.widget.RemoteViews
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
-import com.socialdiabetes.vampire.BaseApplication
-import com.socialdiabetes.vampire.DatabaseManager
-import com.socialdiabetes.vampire.GlucoseRecord
+import xyz.bauber.vampire.BaseApplication
+import xyz.bauber.vampire.database.DatabaseManager
+import xyz.bauber.vampire.database.GlucoseRecord
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.io.ByteArrayOutputStream
-import java.security.MessageDigest
 import java.util.Calendar
 import java.util.TimeZone
 import java.util.concurrent.TimeUnit

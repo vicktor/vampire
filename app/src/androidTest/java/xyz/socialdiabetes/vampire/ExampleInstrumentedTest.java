@@ -1,4 +1,4 @@
-package com.socialdiabetes.vampire;
+package xyz.socialdiabetes.vampire;
 
 import android.content.Context;
 
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("com.socialdiabetes.vampire", appContext.getPackageName());
+        assertEquals("xyz.bauber.vampire", appContext.getPackageName());
     }
 }

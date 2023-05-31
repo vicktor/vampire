@@ -1,6 +1,5 @@
-package com.socialdiabetes.vampire
+package xyz.bauber.vampire.health
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -112,13 +111,12 @@ class HealthConnectManager(private val context: Context) {
         )
 */
 
-        Log.d("vampire", "guaradando glucosa en mmol "+roundToDecimal(value/18))
+        Log.d("vampire", "guardando glucosa  "+value)
         val list = LinkedList<BloodGlucoseRecord>()
         val record = BloodGlucoseRecord(
             time.toInstant(),
             time.offset,
-            //BloodGlucose.milligramsPerDeciliter(value),
-            BloodGlucose.millimolesPerLiter(roundToDecimal(value/18)),
+            BloodGlucose.milligramsPerDeciliter(value),
             SPECIMEN_SOURCE_INTERSTITIAL_FLUID,
             MealType.MEAL_TYPE_UNKNOWN, RELATION_TO_MEAL_GENERAL,
             Metadata()
@@ -131,15 +129,6 @@ class HealthConnectManager(private val context: Context) {
     fun roundToDecimal(number: Double): Double {
         return "%.1f".format(number).replace(",",".").toDouble()
     }
-
-    /*
-    suspend fun writeGlucose(glucose: BloodGlucoseRecord) {
-        val records = listOf(glucose)
-        healthConnectClient.insertRecords(records)
-    }
-
-     */
-
 
     suspend fun readGlucose(start: Instant, end: Instant): List<BloodGlucoseRecord> {
         val request = ReadRecordsRequest(

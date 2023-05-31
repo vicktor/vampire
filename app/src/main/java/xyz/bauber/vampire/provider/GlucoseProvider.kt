@@ -1,10 +1,12 @@
-package com.socialdiabetes.vampire
+package xyz.bauber.vampire.provider
 
 import android.content.ContentProvider
 import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteQueryBuilder
 import android.net.Uri
+import xyz.bauber.vampire.BaseApplication
+import xyz.bauber.vampire.database.DatabaseManager
 
 
 class GlucoseProvider : ContentProvider() {
@@ -62,7 +64,7 @@ class GlucoseProvider : ContentProvider() {
     }
 
     companion object {
-        private const val AUTHORITY = "com.socialdiabetes.vampire.provider"
+        private const val AUTHORITY = "xyz.bauber.vampire.provider"
         private const val BASE_PATH = "glucose"
         val CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH)
     }

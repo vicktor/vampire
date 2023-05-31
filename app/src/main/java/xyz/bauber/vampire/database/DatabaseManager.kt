@@ -1,4 +1,4 @@
-package com.socialdiabetes.vampire
+package xyz.bauber.vampire.database
 
 import android.annotation.SuppressLint
 import android.content.ContentValues
@@ -129,7 +129,7 @@ class DatabaseManager(context: Context) :
                     trend,
                     origin
                 )
-                cursor?.close()
+                cursor.close()
                 return record
             }
         }

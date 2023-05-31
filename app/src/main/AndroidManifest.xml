@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.socialdiabetes.vampire">
+    package="xyz.bauber.vampire">
 
     <uses-permission android:name="android.permission.health.READ_BLOOD_GLUCOSE" />
     <uses-permission android:name="android.permission.health.WRITE_BLOOD_GLUCOSE" />
@@ -21,11 +21,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat"
-        android:name=".BaseApplication">
+        android:name="xyz.bauber.vampire.BaseApplication">
 
 
         <activity
-            android:name="com.socialdiabetes.vampire.MainActivity"
+            android:name="xyz.bauber.vampire.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.AppCompat">
             <intent-filter>
@@ -41,7 +41,7 @@
 
 
         <service
-            android:name=".services.VampireCollector"
+            android:name="xyz.bauber.vampire.services.VampireCollector"
             android:label="VampireCollector"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
             android:exported="true">
@@ -52,8 +52,8 @@
 
 
         <provider
-            android:name=".GlucoseProvider"
-            android:authorities="com.socialdiabetes.vampire.provider"
+            android:name="xyz.bauber.vampire.provider.GlucoseProvider"
+            android:authorities="xyz.bauber.vampire.provider"
             android:exported="true" />
     </application>
 

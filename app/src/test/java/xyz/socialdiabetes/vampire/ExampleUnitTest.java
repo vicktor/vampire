@@ -1,4 +1,4 @@
-package com.socialdiabetes.vampire;
+package xyz.socialdiabetes.vampire;
 
 import org.junit.Test;
 

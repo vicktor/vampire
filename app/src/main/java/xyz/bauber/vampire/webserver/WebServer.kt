@@ -1,8 +1,8 @@
-package com.socialdiabetes.vampire
+package xyz.bauber.vampire.webserver
 
-import android.app.Application
-import android.content.Context
 import com.google.gson.Gson
+import xyz.bauber.vampire.BaseApplication
+import xyz.bauber.vampire.database.DatabaseManager
 import fi.iki.elonen.NanoHTTPD
 
 class WebServer : NanoHTTPD(5566) {

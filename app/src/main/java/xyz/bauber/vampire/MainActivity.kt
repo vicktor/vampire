@@ -1,4 +1,4 @@
-package com.socialdiabetes.vampire
+package xyz.bauber.vampire
 
 import android.content.ComponentName
 import android.content.Intent
@@ -14,9 +14,13 @@ import androidx.compose.runtime.getValue
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.BloodGlucoseRecord
-import com.socialdiabetes.vampire.services.VampireCollector
+import xyz.bauber.vampire.database.DatabaseManager
+import xyz.bauber.vampire.health.HealthConnectAvailability
+import xyz.bauber.vampire.services.VampireCollector
+import xyz.bauber.vampire.webserver.WebServer
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import xyz.bauber.vampire.database.GlucoseRecord
 import java.text.SimpleDateFormat
 
 import java.util.Locale
@@ -92,21 +96,21 @@ class MainActivity : ComponentActivity() {
 
         val databaseManager = DatabaseManager(this)
 
-        val last_glucosa = databaseManager.getLastGlucose()
+        val lastGlucosa : GlucoseRecord? = databaseManager.getLastGlucose()
 
-        if (last_glucosa!! != null) {
-            if (last_glucosa?.glucoseUnits.equals("mgdl")) {
+        if (lastGlucosa != null) {
+            if (lastGlucosa.glucoseUnits.equals("mgdl")) {
                 findViewById<TextView>(R.id.glucose).text =
-                    last_glucosa?.glucoseValue?.toInt().toString()
+                    lastGlucosa.glucoseValue?.toInt().toString()
                 findViewById<TextView>(R.id.units).text = "mg/dL"
 
             } else {
-                findViewById<TextView>(R.id.glucose).text = last_glucosa?.glucoseValue.toString()
+                findViewById<TextView>(R.id.glucose).text = lastGlucosa.glucoseValue.toString()
                 findViewById<TextView>(R.id.units).text = "mmol/L"
             }
             val sdf = SimpleDateFormat("dd-MM HH:mm", Locale.getDefault())
 
-            val trend = when(last_glucosa.trend) {
+            val trend = when(lastGlucosa.trend) {
                 "DOUBLE_UP" -> "↑↑"
                 "SINGLE_UP" -> "↑"
                 "UP_45" -> "↗"
@@ -118,7 +122,7 @@ class MainActivity : ComponentActivity() {
             }
 
             findViewById<TextView>(R.id.trend).text = trend
-            findViewById<TextView>(R.id.fecha).text = getReadableTimeDiff(last_glucosa.timestamp)
+            findViewById<TextView>(R.id.fecha).text = getReadableTimeDiff(lastGlucosa.timestamp)
 
         }
 

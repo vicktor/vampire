@@ -1,6 +1,7 @@
-package com.socialdiabetes.vampire
+package xyz.bauber.vampire
 
 import android.app.Application
+import xyz.bauber.vampire.health.HealthConnectManager
 
 class BaseApplication : Application() {
     val healthConnectManager by lazy {

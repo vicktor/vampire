@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.socialdiabetes.vampire'
+    namespace 'xyz.bauber.vampire'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.socialdiabetes.vampire"
+        applicationId "xyz.bauber.vampire"
         minSdk 28
         targetSdk 33
         versionCode 1
