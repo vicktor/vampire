@@ -35,6 +35,13 @@ All data are returned in JSON:
   "trend":"FLAT"
 }
 ```
+## Bugs
+Sometimes the service stops and does not continue to collect data. 
+There is no way to restart it it seems and the only option is for the user to remove the permissions to read notifications and re-enable them. 
+From that moment on the notifications are received again.
+I have tried to reactivate it from a JobService, but it doesn't seem to work as it is a system service.
+If anyone knows how to fix this, open an issue or make a pull request.
+
 ## Contributing
 Of course, collaboration and pull requests are welcome. 
 

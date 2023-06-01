@@ -1,12 +1,15 @@
 package xyz.bauber.vampire.services
 
 import android.app.Notification
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
+import android.provider.Settings
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
+import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -14,23 +17,26 @@ import android.widget.ImageView
 import android.widget.RemoteViews
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import xyz.bauber.vampire.BaseApplication
 import xyz.bauber.vampire.database.DatabaseManager
 import xyz.bauber.vampire.database.GlucoseRecord
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.TimeZone
 import java.util.concurrent.TimeUnit
 
+
 class VampireCollector : NotificationListenerService() {
     @VisibleForTesting
     var lastPackage: String? = null
+    var mContext: Context? = null
     override fun onCreate() {
         super.onCreate()
         mContext = applicationContext
         Log.d("vampire", "onCreate: NotificationListenerService ")
         isRunning = true
+
     }
 
     override fun onDestroy() {
@@ -62,15 +68,21 @@ class VampireCollector : NotificationListenerService() {
         Log.d(TAG, "processNotification")
         val content = Notification.Builder.recoverBuilder(mContext, notification).createContentView()
 
+        if (content != null) {
+            processContent(content)
+        }
+        /*
         if (notification?.contentView != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val cid = notification.channelId
             }
             processRemote(notification.contentView)
         }
+
+         */
     }
 
-    fun filterString(value: String): String {
+    private fun filterString(value: String): String {
         return if (lastPackage == null) value else when (lastPackage) {
             else -> value
                 .replace("mmol/L", "")
@@ -81,6 +93,10 @@ class VampireCollector : NotificationListenerService() {
                 .replace("≥", "")
                 .trim { it <= ' ' }
         }
+    }
+
+    private fun processContent(cview: RemoteViews? ) {
+        processRemote(cview)
     }
 
     private fun processRemote(cview: RemoteViews?) {
@@ -262,6 +278,13 @@ class VampireCollector : NotificationListenerService() {
         return trend
     }
 
+    private fun tsl(): Long {
+        return System.currentTimeMillis()
+    }
+
+
+
+
     companion object {
         private const val TAG = "vampire"
         private val coOptedPackages = HashSet<String>()
@@ -283,11 +306,6 @@ class VampireCollector : NotificationListenerService() {
             coOptedPackages.add("com.medtronic.diabetes.minimedmobile.us")
         }
 
-        var mContext: Context? = null
-
-        private fun tsl(): Long {
-            return System.currentTimeMillis()
-        }
 
 
     }

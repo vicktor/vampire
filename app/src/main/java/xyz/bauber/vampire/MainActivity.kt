@@ -11,7 +11,9 @@ import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
+import android.text.TextUtils
 import android.util.Log
+import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -54,6 +56,11 @@ class MainActivity : ComponentActivity() {
         val healthConnectManager = (application as BaseApplication).healthConnectManager
 
         val availability by healthConnectManager.availability
+
+        findViewById<Button>(R.id.bPermission).setOnClickListener {
+            startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+        }
+
         val cn = ComponentName(this, VampireCollector::class.java)
         val flat = Settings.Secure.getString(
             this.getContentResolver(),
@@ -100,15 +107,42 @@ class MainActivity : ComponentActivity() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+        /*
         val jobScheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
 
         val jobInfo = JobInfo.Builder(0, ComponentName(this, CheckService::class.java))
-            .setPeriodic(15 * 60 * 1000) // Este valor será ajustado a aproximadamente 15 minutos en Android 7.0 y versiones posteriores
+            .setPeriodic(15 * 60 * 1000)
             .setPersisted(true)
             .build()
 
         jobScheduler.schedule(jobInfo)
+         */
 
+        if (!isNotificationServiceEnabled()) {
+            startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+
+        }
+
+    }
+
+
+    fun isNotificationServiceEnabled(): Boolean {
+        val pkgName = BaseApplication.instance.packageName
+        val flat = Settings.Secure.getString(BaseApplication.instance.contentResolver,
+            "enabled_notification_listeners"
+        )
+        if (!TextUtils.isEmpty(flat)) {
+            val names = flat.split(":")
+            for (name in names) {
+                val cn = ComponentName.unflattenFromString(name)
+                if (cn != null) {
+                    if (TextUtils.equals(pkgName, cn.packageName)) {
+                        return true
+                    }
+                }
+            }
+        }
+        return false
     }
 
     fun checkBattery() {
