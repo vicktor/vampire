@@ -8,6 +8,9 @@ Optionally you can write all information in Google [Health Connect](https://deve
 Based on the great [xDrip+](https://github.com/NightscoutFoundation/xDrip) project without which, **vampire** would not exist.
 
 ![vampire](https://github.com/vicktor/vampire/assets/382114/62048346-2e58-4d82-bf9f-1365a646d314)
+![health](https://github.com/vicktor/vampire/assets/382114/1d60fde0-abae-41a5-ac75-86bc41354d2c)
+![glucosa](https://github.com/vicktor/vampire/assets/382114/fbd1f990-2c8b-4ce4-b09f-317394f8b552)
+ 
 
 ## Configuration
 
