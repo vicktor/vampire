@@ -61,5 +61,9 @@ If anyone knows how to fix this, open an issue or make a pull request.
 ## Contributing
 Of course, collaborations and pull requests are welcome. 
 
+## Credits
+Icon -> [icon-icons.com](https://icon-icons.com/icon/vampire/2710)
+WebServer -> [NanoHTTPD](https://github.com/NanoHttpd/nanohttpd)
+
 ## Thanks
 Again kudos to awesome xDrip+ Team and all people fighting against diabetes. 

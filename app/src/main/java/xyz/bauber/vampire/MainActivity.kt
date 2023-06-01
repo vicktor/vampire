@@ -36,9 +36,6 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
-
-
-
 @OptIn(DelicateCoroutinesApi::class)
 class MainActivity : ComponentActivity() {
 
@@ -74,7 +71,6 @@ class MainActivity : ComponentActivity() {
         }
 
         if (availability == HealthConnectAvailability.INSTALLED) {
-            Toast.makeText(this, "health connect manager disponbible", Toast.LENGTH_LONG).show()
             GlobalScope.launch {
                 healthConnectManager.hasAllPermissions(permissions)
                 healthConnectManager.healthConnectCompatibleApps
@@ -89,9 +85,8 @@ class MainActivity : ComponentActivity() {
                 }
             }
         } else {
-            Toast.makeText(this, "health connect manager NO disponbible", Toast.LENGTH_LONG).show()
             Toast.makeText(
-                this, "Health Connect is not available", Toast.LENGTH_SHORT
+                this, R.string.hc_notavailable, Toast.LENGTH_SHORT
             ).show()
             val uri = Uri.parse("market://details?id=com.google.android.apps.healthdata")
             val gpIntent = Intent(Intent.ACTION_VIEW, uri)
@@ -202,13 +197,12 @@ class MainActivity : ComponentActivity() {
             if (lastGlucosa.glucoseUnits.equals("mgdl")) {
                 findViewById<TextView>(R.id.glucose).text =
                     lastGlucosa.glucoseValue?.toInt().toString()
-                findViewById<TextView>(R.id.units).text = "mg/dL"
+                findViewById<TextView>(R.id.units).text = getString(R.string.mgdl)
 
             } else {
                 findViewById<TextView>(R.id.glucose).text = lastGlucosa.glucoseValue.toString()
-                findViewById<TextView>(R.id.units).text = "mmol/L"
+                findViewById<TextView>(R.id.units).text = getString(R.string.mmol)
             }
-            val sdf = SimpleDateFormat("dd-MM HH:mm", Locale.getDefault())
 
             val trend = when(lastGlucosa.trend) {
                 "DOUBLE_UP" -> "↑↑"
@@ -244,16 +238,16 @@ class MainActivity : ComponentActivity() {
         val diff = System.currentTimeMillis() - timestamp
 
         val days = TimeUnit.MILLISECONDS.toDays(diff)
-        if (days > 0) return "$days día(s)"
+        if (days > 0) return "$days ${getString(R.string.days)}"
 
         val hours = TimeUnit.MILLISECONDS.toHours(diff).toInt()
-        if (hours == 1) return "$hours hora" else if (hours > 1) return "$hours horas"
+        if (hours == 1) return "$hours ${getString(R.string.hour)}" else if (hours > 1) return "$hours ${getString(R.string.hours)}"
 
         val minutes = TimeUnit.MILLISECONDS.toMinutes(diff).toInt()
-        if (minutes == 1) return "$minutes minuto" else if (minutes > 1) return "$minutes minutos"
+        if (minutes == 1) return "$minutes ${getString(R.string.minute)}" else if (minutes > 1) return "$minutes ${getString(R.string.minutes)}"
 
         val seconds = TimeUnit.MILLISECONDS.toSeconds(diff)
-        return "$seconds segundos"
+        return "$seconds ${getString(R.string.seconds)}"
     }
 
 
