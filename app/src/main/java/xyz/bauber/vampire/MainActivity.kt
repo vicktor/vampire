@@ -1,5 +1,8 @@
 package xyz.bauber.vampire
 
+import android.app.ActivityManager
+import android.app.job.JobInfo
+import android.app.job.JobScheduler
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -22,11 +25,14 @@ import kotlinx.coroutines.launch
 import xyz.bauber.vampire.database.DatabaseManager
 import xyz.bauber.vampire.database.GlucoseRecord
 import xyz.bauber.vampire.health.HealthConnectAvailability
+import xyz.bauber.vampire.services.CheckService
 import xyz.bauber.vampire.services.VampireCollector
 import xyz.bauber.vampire.webserver.WebServer
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+
+
 
 
 class MainActivity : ComponentActivity() {
@@ -39,6 +45,8 @@ class MainActivity : ComponentActivity() {
         HealthPermission.getWritePermission(BloodGlucoseRecord::class),
         HealthPermission.getReadPermission(BloodGlucoseRecord::class)
     )
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -92,6 +100,14 @@ class MainActivity : ComponentActivity() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+        val jobScheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+
+        val jobInfo = JobInfo.Builder(0, ComponentName(this, CheckService::class.java))
+            .setPeriodic(15 * 60 * 1000) // Este valor será ajustado a aproximadamente 15 minutos en Android 7.0 y versiones posteriores
+            .setPersisted(true)
+            .build()
+
+        jobScheduler.schedule(jobInfo)
 
     }
 
@@ -159,6 +175,14 @@ class MainActivity : ComponentActivity() {
         server.stop()
     }
 
+
+    @Suppress("DEPRECATION")
+    fun <T> isServiceRunning(service: Class<T>): Boolean {
+        return (getSystemService(ACTIVITY_SERVICE) as ActivityManager)
+            .getRunningServices(Integer.MAX_VALUE)
+            .any { it -> it.service.className == service.name }
+    }
+
     fun requestPermissionsActivityContract(): ActivityResultContract<Set<String>, Set<String>> {
         val healthConnectManager = (application as BaseApplication).healthConnectManager
         return PermissionController.createRequestPermissionResultContract()
@@ -180,4 +204,6 @@ class MainActivity : ComponentActivity() {
         val seconds = TimeUnit.MILLISECONDS.toSeconds(diff)
         return "$seconds segundos"
     }
+
+
 }

@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="xyz.bauber.vampire">
 
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.health.READ_BLOOD_GLUCOSE" />
     <uses-permission android:name="android.permission.health.WRITE_BLOOD_GLUCOSE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -50,6 +51,10 @@
             </intent-filter>
         </service>
 
+        <service
+            android:name="xyz.bauber.vampire.services.CheckService"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="true"/>
 
         <provider
             android:name="xyz.bauber.vampire.provider.GlucoseProvider"
