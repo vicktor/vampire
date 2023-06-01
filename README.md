@@ -40,7 +40,22 @@ From xDrip+
     coOptedPackages.add("com.medtronic.diabetes.minimedmobile.us")
 ```
 
+## Reading data Health Connect
+
+Take a look at [Health Connect API](https://developer.android.com/guide/health-and-fitness/health-connect)
+
+[Health Connect SDK](https://developer.android.com/guide/health-and-fitness/health-connect/sdk-changes)
+
+[Health Connect Toolbox](https://developer.android.com/guide/health-and-fitness/health-connect-guidelines/test-guidance/health-connect-toolbox)
+
+
+## Reading data with ContentProvider
+
+Take a look at Google Developers [ContentProvider](https://developer.android.com/reference/android/content/ContentProvider)
+
 ## Reading data with WebServer
+
+Surely, this is the easiest way to access the data, all the data read is stored in a table and made available to any app through a web server with only 2 endpoints to retrieve the information.
 
 Open http://localhost:5566/glucoses from your app to read last 24 hours of glucoses
 
