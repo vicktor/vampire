@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Vampire</string>
+    <string name="permissions_screen">Muestra pantalla de permisos</string>
+    <string name="minute">minuto</string>
+    <string name="minutes">minutos</string>
+    <string name="hour">hora</string>
+    <string name="hours">horas</string>
+    <string name="seconds">segundos</string>
+    <string name="days">días</string>
+    <string name="mgdl">mg/dL</string>
+    <string name="mmol">mmol/L</string>
+    <string name="hc_notavailable">Health Connect no está disponible</string>
+</resources>
