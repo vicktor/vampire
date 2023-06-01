@@ -6,6 +6,7 @@ import android.app.job.JobScheduler
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -22,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.BloodGlucoseRecord
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import xyz.bauber.vampire.database.DatabaseManager
@@ -37,6 +39,7 @@ import java.util.concurrent.TimeUnit
 
 
 
+@OptIn(DelicateCoroutinesApi::class)
 class MainActivity : ComponentActivity() {
 
     private lateinit var server: WebServer
@@ -47,7 +50,6 @@ class MainActivity : ComponentActivity() {
         HealthPermission.getWritePermission(BloodGlucoseRecord::class),
         HealthPermission.getReadPermission(BloodGlucoseRecord::class)
     )
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,7 +81,7 @@ class MainActivity : ComponentActivity() {
 
                 GlobalScope.launch {
                     if (!healthConnectManager.hasAllPermissions(permissions)) {
-                        Log.d("vampire", "no hay permisos concedidos")
+                        Log.d(BaseApplication.TAG, "no hay permisos concedidos")
                         val permissionsLauncher = healthConnectManager.requestPermissionsActivityContract()
                         permissionsLauncher.createIntent(application, permissions)
                         requestPermissionsActivityContract()
@@ -107,24 +109,44 @@ class MainActivity : ComponentActivity() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        /*
+
         val jobScheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
 
         val jobInfo = JobInfo.Builder(0, ComponentName(this, CheckService::class.java))
             .setPeriodic(15 * 60 * 1000)
+            .setRequiresCharging(false)
+            .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
             .setPersisted(true)
             .build()
 
         jobScheduler.schedule(jobInfo)
-         */
 
+/*
         if (!isNotificationServiceEnabled()) {
-            startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
-
+            //startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+            toggleNotificationListenerService()
         }
-
+*/
     }
+/*
 
+    private fun toggleNotificationListenerService() {
+        val pm = packageManager
+        pm.setComponentEnabledSetting(
+            ComponentName(
+                this,
+                VampireCollector::class.java
+            ),
+            PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP
+        )
+        pm.setComponentEnabledSetting(
+            ComponentName(
+                this,
+                VampireCollector::class.java
+            ),
+            PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP
+        )
+    }
 
     fun isNotificationServiceEnabled(): Boolean {
         val pkgName = BaseApplication.instance.packageName
@@ -144,27 +166,29 @@ class MainActivity : ComponentActivity() {
         }
         return false
     }
-
+*/
     fun checkBattery() {
-        if (!isIgnoringBatteryOptimizations(this) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (!isIgnoringBatteryOptimizations()) {
             val name = resources.getString(R.string.app_name)
             Toast.makeText(applicationContext, "Battery optimization -> All apps -> $name -> Don't optimize", Toast.LENGTH_LONG).show()
 
-            val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+            //val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+            //startActivity(intent)
+            val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+            intent.data = Uri.parse("package:$packageName")
             startActivity(intent)
+        } else {
+            Log.d(BaseApplication.TAG, "Se ignoran las restricciones de bateria")
         }
     }
 
     /**
      * return true if in App's Battery settings "Not optimized" and false if "Optimizing battery use"
      */
-    fun isIgnoringBatteryOptimizations(context: Context): Boolean {
-        val pwrm = context.applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
-        val name = context.applicationContext.packageName
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return pwrm.isIgnoringBatteryOptimizations(name)
-        }
-        return true
+    fun isIgnoringBatteryOptimizations(): Boolean {
+        val pwrm = getSystemService(Context.POWER_SERVICE) as PowerManager
+        val name = packageName
+        return pwrm.isIgnoringBatteryOptimizations(name)
     }
 
     override fun onResume() {
@@ -209,13 +233,6 @@ class MainActivity : ComponentActivity() {
         server.stop()
     }
 
-
-    @Suppress("DEPRECATION")
-    fun <T> isServiceRunning(service: Class<T>): Boolean {
-        return (getSystemService(ACTIVITY_SERVICE) as ActivityManager)
-            .getRunningServices(Integer.MAX_VALUE)
-            .any { it -> it.service.className == service.name }
-    }
 
     fun requestPermissionsActivityContract(): ActivityResultContract<Set<String>, Set<String>> {
         val healthConnectManager = (application as BaseApplication).healthConnectManager

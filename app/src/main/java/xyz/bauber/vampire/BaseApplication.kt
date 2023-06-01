@@ -16,6 +16,7 @@ class BaseApplication : Application() {
 
 
     companion object {
+        const val TAG = "vampire"
         lateinit var instance: BaseApplication
             private set
     }

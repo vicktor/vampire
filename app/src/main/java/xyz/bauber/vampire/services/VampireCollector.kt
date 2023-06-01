@@ -4,12 +4,11 @@ import android.app.Notification
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.IBinder
-import android.provider.Settings
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
-import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -34,7 +33,7 @@ class VampireCollector : NotificationListenerService() {
     override fun onCreate() {
         super.onCreate()
         mContext = applicationContext
-        Log.d("vampire", "onCreate: NotificationListenerService ")
+        Log.d(BaseApplication.TAG, "onCreate: NotificationListenerService ")
         isRunning = true
 
     }
@@ -42,13 +41,14 @@ class VampireCollector : NotificationListenerService() {
     override fun onDestroy() {
         super.onDestroy()
         isRunning = false
+        toggleNotificationListenerService()
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         val fromPackage = sbn.packageName
-        Log.d(TAG, "Notification from: $fromPackage")
+        Log.d(BaseApplication.TAG, "Notification from: $fromPackage")
         if (coOptedPackages.contains(fromPackage)) {
-            Log.d(TAG, "VALID Notification from: $fromPackage")
+            Log.d(BaseApplication.TAG, "VALID Notification from: $fromPackage")
             if (sbn.isOngoing) {
                 lastPackage = fromPackage
                 processNotification(sbn.notification)
@@ -57,29 +57,74 @@ class VampireCollector : NotificationListenerService() {
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification) {
-        //
+        super.onNotificationRemoved(sbn)
     }
 
+
+    private fun toggleNotificationListenerService() {
+        val pm = packageManager
+        pm.setComponentEnabledSetting(
+            ComponentName(
+                this,
+                VampireCollector::class.java
+            ),
+            PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP
+        )
+        pm.setComponentEnabledSetting(
+            ComponentName(
+                this,
+                VampireCollector::class.java
+            ),
+            PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP
+        )
+    }
+/*
     override fun onBind(intent: Intent): IBinder? {
         return super.onBind(intent)
     }
 
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        Log.d(BaseApplication.TAG, "Notification service onStartCommandCalled")
+        if (intent != null && intent.action.equals(REBIND_ACTION)) {
+            Log.d(BaseApplication.TAG, "TRYING REBIND SERVICE....")
+            tryReconnectService() //switch on/off component and rebind
+        }
+        //START_STICKY  to order the system to restart your service as soon as possible when it was killed.
+        return START_STICKY
+    }
+    fun tryReconnectService() {
+        toggleNotificationListenerService()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            val componentName = ComponentName(
+                applicationContext,
+                VampireCollector::class.java
+            )
+
+            //It say to Notification Manager RE-BIND your service to listen notifications again inmediatelly!
+            requestRebind(componentName)
+        }
+    }
+
+    private fun toggleNotificationListenerService() {
+        val pm = packageManager
+        pm.setComponentEnabledSetting(
+            ComponentName(this, VampireCollector::class.java),
+            PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP
+        )
+        pm.setComponentEnabledSetting(
+            ComponentName(this, VampireCollector::class.java),
+            PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP
+        )
+    }
+ */
+
     private fun processNotification(notification: Notification?) {
-        Log.d(TAG, "processNotification")
+        Log.d(BaseApplication.TAG, "processNotification")
         val content = Notification.Builder.recoverBuilder(mContext, notification).createContentView()
 
         if (content != null) {
             processContent(content)
         }
-        /*
-        if (notification?.contentView != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val cid = notification.channelId
-            }
-            processRemote(notification.contentView)
-        }
-
-         */
     }
 
     private fun filterString(value: String): String {
@@ -96,17 +141,12 @@ class VampireCollector : NotificationListenerService() {
     }
 
     private fun processContent(cview: RemoteViews? ) {
-        processRemote(cview)
-    }
-
-    private fun processRemote(cview: RemoteViews?) {
-        Log.d(TAG, "processRemote")
         if (cview == null) return
         val applied = cview.apply(this, null)
         val root = applied.rootView as ViewGroup
         val texts = ArrayList<TextView>()
         getTextViews(texts, root)
-        Log.d(TAG, "Text views: " + texts.size)
+        Log.d(BaseApplication.TAG, "Text views: " + texts.size)
         var matches = 0
         var mgdl = 0
         for (view in texts) {
@@ -115,7 +155,7 @@ class VampireCollector : NotificationListenerService() {
                 val text = if (tv.text != null) tv.text.toString() else ""
                 val desc =
                     if (tv.contentDescription != null) tv.contentDescription.toString() else ""
-                Log.d(TAG, "Examining: >$text< : >$desc<")
+                Log.d(BaseApplication.TAG, "Examining: >$text< : >$desc<")
                 val ftext = filterString(text)
                 mgdl = ftext.toInt()
                 if (mgdl > 0) {
@@ -126,11 +166,11 @@ class VampireCollector : NotificationListenerService() {
             }
         }
         if (matches > 1) {
-            Log.e(TAG, "Found too many matches: $matches")
+            Log.e(BaseApplication.TAG, "Found too many matches: $matches")
         } else if (matches == 1) {
-            Log.d(TAG, "Found glucose: $mgdl")
+            Log.d(BaseApplication.TAG, "Found glucose: $mgdl")
             if (mgdl in 30..450) {
-                Log.e(TAG, "glucose reading $mgdl")
+                Log.e(BaseApplication.TAG, "glucose reading $mgdl")
                 val healthConnectManager = (application as BaseApplication).healthConnectManager
                 var databaseManager = mContext?.let { DatabaseManager(it) }
 
@@ -143,7 +183,7 @@ class VampireCollector : NotificationListenerService() {
                     current_trend = getTrend(lastGlucose, time, mgdl)
                 }
 
-                Log.d(TAG, current_trend)
+                Log.d(BaseApplication.TAG, current_trend)
 
                 databaseManager?.insertGlucoseRecord(
                     time,
@@ -177,7 +217,7 @@ class VampireCollector : NotificationListenerService() {
             val view = parent.getChildAt(i)
             if (view.visibility == View.VISIBLE) {
                 if (view is ImageView) {
-                    Log.d(TAG, "hemos encontrado una imagen ID: "+view.id.toString())
+                    Log.d(BaseApplication.TAG, "hemos encontrado una imagen ID: "+view.id.toString())
 /*
                     val drawable = view.drawable
                     val stream = ByteArrayOutputStream()
@@ -214,14 +254,14 @@ class VampireCollector : NotificationListenerService() {
 
                     // Convierte el hash a una cadena hexadecimal para una fácil visualización
                     val hexHash = hash.joinToString("") { "%02x".format(it) }
-                    Log.d(TAG, "hemos encontrado una imagen SHA: $hexHash")
+                    Log.d(BaseApplication.TAG, "hemos encontrado una imagen SHA: $hexHash")
 
 
                     current_trend = "UNKNOWN"
 
 
                     if (view.id.equals(2131297229)) {
-                        Log.d(TAG, "TREND: FLAT → ")
+                        Log.d(BaseApplication.TAG, "TREND: FLAT → ")
                         current_trend = "FLAT"
                     } else {
                         current_trend = view.id.toString()
@@ -250,8 +290,8 @@ class VampireCollector : NotificationListenerService() {
             7 - DOUBLE_DOWN ↓↓      decreasing >3 mg/dL/min
             */
 
-        Log.d(TAG, "Last glucose: "+lastGlucose.glucoseValue)
-        Log.d(TAG, "Current glucose: "+mgdl)
+        Log.d(BaseApplication.TAG, "Last glucose: "+lastGlucose.glucoseValue)
+        Log.d(BaseApplication.TAG, "Current glucose: "+mgdl)
         if (lastGlucose != null) {
             val time_elapsed = time - lastGlucose.timestamp
             val minutes = TimeUnit.MILLISECONDS.toMinutes(time_elapsed).toInt()
@@ -259,9 +299,9 @@ class VampireCollector : NotificationListenerService() {
             if (minutes in 1..6) {
                 val slope = diff / 5
 
-                Log.d(TAG, "minutes: " + minutes)
-                Log.d(TAG, "diff glucose: " + diff)
-                Log.d(TAG, "slope glucose: " + slope)
+                Log.d(BaseApplication.TAG, "minutes: " + minutes)
+                Log.d(BaseApplication.TAG, "diff glucose: " + diff)
+                Log.d(BaseApplication.TAG, "slope glucose: " + slope)
                 if (minutes < 6) {
                     if (slope > 3.3) trend = "DOUBLE_UP"
                     if (slope in 2.3..3.3) trend = "SINGLE_UP"
@@ -282,11 +322,7 @@ class VampireCollector : NotificationListenerService() {
         return System.currentTimeMillis()
     }
 
-
-
-
     companion object {
-        private const val TAG = "vampire"
         private val coOptedPackages = HashSet<String>()
 
         var isRunning = false

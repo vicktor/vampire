@@ -18,6 +18,7 @@ import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
 import androidx.health.connect.client.units.BloodGlucose
 import androidx.health.connect.client.records.metadata.Metadata
+import xyz.bauber.vampire.BaseApplication
 import java.time.Instant
 import java.time.ZonedDateTime
 import java.util.LinkedList
@@ -98,7 +99,7 @@ class HealthConnectManager(private val context: Context) {
     suspend fun writeGlucose(value: Double, units: Int) {
         val time = ZonedDateTime.now().withNano(0)
 
-        Log.d("vampire", "guardando glucosa  "+value)
+        Log.d(BaseApplication.TAG, "guardando glucosa  "+value)
         val list = LinkedList<BloodGlucoseRecord>()
         val record = BloodGlucoseRecord(
             time.toInstant(),
