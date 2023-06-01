@@ -6,11 +6,11 @@
 Read glucose from notifications and **share** it with **anyone** through internal WebServer and ContentProvider.
 Optionally you can write all information in Google [Health Connect](https://developer.android.com/guide/health-and-fitness/health-connect).
 
-Based on the great [xDrip](https://github.com/NightscoutFoundation/xDrip) project without which, **vampire** would not exist.
+Based on the great [xDrip+](https://github.com/NightscoutFoundation/xDrip) project without which, **vampire** would not exist.
 
 ## Configuration
 
-App needs special permission to read your notifications, you can inspect the code for your security.
+App needs special permission to read your notifications, you can inspect the code for your safety and peace of mind.
 
 Go to Settings -> Accessibility -> Notifications and allow **vampire** to access your notifications, allow all
 
@@ -30,6 +30,11 @@ All data are returned in JSON:
   "origin":"Dexcom",
   "timestamp":1685461844641,
   "timestampOffset":120,
-  "trend":"flat"
+  "trend":"FLAT"
 }
 ```
+## Contributing
+Of course, collaboration and pull requests are welcome. 
+
+## Thanks
+Again kudos to awesome xDrip+ Team and all people fighting against diabetes. 
