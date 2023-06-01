@@ -8,6 +8,8 @@ Optionally you can write all information in Google [Health Connect](https://deve
 
 Based on the great [xDrip+](https://github.com/NightscoutFoundation/xDrip) project without which, **vampire** would not exist.
 
+![vampire](https://github.com/vicktor/vampire/assets/382114/62048346-2e58-4d82-bf9f-1365a646d314)
+
 ## Configuration
 
 App needs special permission to read your notifications, you can inspect the code for your safety and peace of mind.
