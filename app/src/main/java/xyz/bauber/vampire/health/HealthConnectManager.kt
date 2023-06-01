@@ -96,20 +96,7 @@ class HealthConnectManager(private val context: Context) {
     }
 
     suspend fun writeGlucose(value: Double, units: Int) {
-
         val time = ZonedDateTime.now().withNano(0)
-/*
-        var glucose = BloodGlucose(110.0, BloodGlucose.Type.MILLIGRAMS_PER_DECILITER)
-
-            //.milligramsPerDeciliter(111.0)
-        var lectura = BloodGlucoseRecord(
-            level = glucose,
-            specimenSource = SPECIMEN_SOURCE_INTERSTITIAL_FLUID,
-            mealType = MealType.MEAL_TYPE_UNKNOWN,
-            time = time.toInstant(),
-            zoneOffset = time.offset,
-        )
-*/
 
         Log.d("vampire", "guardando glucosa  "+value)
         val list = LinkedList<BloodGlucoseRecord>()
