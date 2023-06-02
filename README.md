@@ -1,4 +1,5 @@
-![vampire_xs](https://github.com/vicktor/vampire/assets/382114/29897482-3b7f-4144-a540-c460e2b3d794)
+![vampire_xs](https://github.com/vicktor/vampire/assets/382114/90813c29-7c22-4fa4-80b2-1f667fb9d7d9)
+
 # vampire | Delighted to suck your glucoses
 ###### _Give me back my **fucking data**_
 
@@ -9,10 +10,9 @@ Based on the great [xDrip+](https://github.com/NightscoutFoundation/xDrip) proje
 
 ## Screenshots
 
-![vampire](https://github.com/vicktor/vampire/assets/382114/62048346-2e58-4d82-bf9f-1365a646d314)
-![health](https://github.com/vicktor/vampire/assets/382114/1d60fde0-abae-41a5-ac75-86bc41354d2c)
-![glucosa](https://github.com/vicktor/vampire/assets/382114/fbd1f990-2c8b-4ce4-b09f-317394f8b552)
- 
+![vampire](https://github.com/vicktor/vampire/assets/382114/89195d2d-d139-4fdb-bf2f-853af0eb1479)
+![health](https://github.com/vicktor/vampire/assets/382114/d45ef88a-7a39-4852-9783-e4594ee4e766)
+![glucosa](https://github.com/vicktor/vampire/assets/382114/6ae4663f-42fa-449b-814f-31e19d158a74)
 
 ## Configuration
 
@@ -78,6 +78,10 @@ All data are returned in JSON:
   "trend":"FLAT"
 }
 ```
+
+## ToDo
+Code needs to be improved and unused parts removed
+
 ## Bugs
 Sometimes the service stops and does not continue to collect data. 
 If anyone knows how to fix this, open an issue or make a pull request.
