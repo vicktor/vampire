@@ -1,18 +1,14 @@
 package xyz.bauber.vampire
 
-import android.app.ActivityManager
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
-import android.text.TextUtils
 import android.util.Log
 import android.widget.Button
 import android.widget.Switch
@@ -22,11 +18,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.compose.runtime.getValue
 import androidx.health.connect.client.PermissionController
-import androidx.health.connect.client.permission.HealthPermission
-import androidx.health.connect.client.records.BloodGlucoseRecord
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import xyz.bauber.vampire.database.DatabaseManager
 import xyz.bauber.vampire.database.GlucoseRecord
 import xyz.bauber.vampire.health.HealthConnectAvailability
@@ -34,8 +30,6 @@ import xyz.bauber.vampire.health.HealthConnectManager
 import xyz.bauber.vampire.services.CheckService
 import xyz.bauber.vampire.services.VampireCollector
 import xyz.bauber.vampire.webserver.WebServer
-import java.text.SimpleDateFormat
-import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 @OptIn(DelicateCoroutinesApi::class)
@@ -45,10 +39,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var healthConnectManager: HealthConnectManager
     val HEALTH_CONNECT_RESPONSE_ID = 10000
 
-    val permissions = setOf(
-        HealthPermission.getWritePermission(BloodGlucoseRecord::class),
-        HealthPermission.getReadPermission(BloodGlucoseRecord::class)
-    )
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,13 +52,16 @@ class MainActivity : ComponentActivity() {
         }
 
         GlobalScope.launch {
-            if (healthConnectManager.hasAllPermissions(permissions)) {
-                findViewById<Switch>(R.id.hconnect).isChecked = true
+            if (healthConnectManager.hasAllPermissions(healthConnectManager.permissions)) {
+                // run main thread
+                withContext(Dispatchers.Main) {
+                    findViewById<Switch>(R.id.hconnect).isChecked = true
+                }
             }
         }
 
         findViewById<Switch>(R.id.hconnect).setOnClickListener {
-            toggleHC()
+            toggleHC(findViewById<Switch>(R.id.hconnect).isChecked)
         }
 
         val cn = ComponentName(this, VampireCollector::class.java)
@@ -100,84 +94,47 @@ class MainActivity : ComponentActivity() {
 
         jobScheduler.schedule(jobInfo)
 
-/*
-        if (!isNotificationServiceEnabled()) {
-            //startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
-            toggleNotificationListenerService()
-        }
-*/
     }
 
-    private fun toggleHC() {
-        val availability by healthConnectManager.availability
+    private fun toggleHC(checked: Boolean) {
+        when(checked) {
+            true -> {
+                val availability by healthConnectManager.availability
 
-        if (availability == HealthConnectAvailability.INSTALLED) {
-            GlobalScope.launch {
-                healthConnectManager.hasAllPermissions(permissions)
-                healthConnectManager.healthConnectCompatibleApps
+                if (availability == HealthConnectAvailability.INSTALLED) {
+                    GlobalScope.launch {
+                        healthConnectManager.hasAllPermissions(healthConnectManager.permissions)
+                        healthConnectManager.healthConnectCompatibleApps
 
+                        GlobalScope.launch {
+                            if (!healthConnectManager.hasAllPermissions(healthConnectManager.permissions)) {
+                                Log.d(BaseApplication.TAG, "no hay permisos concedidos")
+                                val permissionsLauncher = healthConnectManager.requestPermissionsActivityContract()
+                                permissionsLauncher.createIntent(application, healthConnectManager.permissions)
+                                requestPermissionsActivityContract()
+                            }
+                        }
+                    }
+                } else {
+                    Toast.makeText(
+                        this, R.string.hc_notavailable, Toast.LENGTH_SHORT
+                    ).show()
+                    val uri = Uri.parse("market://details?id=com.google.android.apps.healthdata")
+                    val gpIntent = Intent(Intent.ACTION_VIEW, uri)
+                    this.startActivity(gpIntent)
+                }
+
+                val permsIntent = PermissionController.createRequestPermissionResultContract().createIntent(this, healthConnectManager.permissions);
+                startActivityForResult(permsIntent, HEALTH_CONNECT_RESPONSE_ID);
+            }
+            false -> {
                 GlobalScope.launch {
-                    if (!healthConnectManager.hasAllPermissions(permissions)) {
-                        Log.d(BaseApplication.TAG, "no hay permisos concedidos")
-                        val permissionsLauncher = healthConnectManager.requestPermissionsActivityContract()
-                        permissionsLauncher.createIntent(application, permissions)
-                        requestPermissionsActivityContract()
-                    }
-                }
-            }
-        } else {
-            Toast.makeText(
-                this, R.string.hc_notavailable, Toast.LENGTH_SHORT
-            ).show()
-            val uri = Uri.parse("market://details?id=com.google.android.apps.healthdata")
-            val gpIntent = Intent(Intent.ACTION_VIEW, uri)
-            this.startActivity(gpIntent)
-        }
-
-        val permsIntent = PermissionController.createRequestPermissionResultContract().createIntent(this, permissions);
-        startActivityForResult(permsIntent, HEALTH_CONNECT_RESPONSE_ID);
-
-    }
-
-/*
-
-    private fun toggleNotificationListenerService() {
-        val pm = packageManager
-        pm.setComponentEnabledSetting(
-            ComponentName(
-                this,
-                VampireCollector::class.java
-            ),
-            PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP
-        )
-        pm.setComponentEnabledSetting(
-            ComponentName(
-                this,
-                VampireCollector::class.java
-            ),
-            PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP
-        )
-    }
-
-    fun isNotificationServiceEnabled(): Boolean {
-        val pkgName = BaseApplication.instance.packageName
-        val flat = Settings.Secure.getString(BaseApplication.instance.contentResolver,
-            "enabled_notification_listeners"
-        )
-        if (!TextUtils.isEmpty(flat)) {
-            val names = flat.split(":")
-            for (name in names) {
-                val cn = ComponentName.unflattenFromString(name)
-                if (cn != null) {
-                    if (TextUtils.equals(pkgName, cn.packageName)) {
-                        return true
-                    }
+                    healthConnectManager.revokeAllPermissions()
                 }
             }
         }
-        return false
     }
-*/
+
     fun checkBattery() {
         if (!isIgnoringBatteryOptimizations()) {
             val name = resources.getString(R.string.app_name)

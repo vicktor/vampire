@@ -78,45 +78,6 @@ class VampireCollector : NotificationListenerService() {
             PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP
         )
     }
-/*
-    override fun onBind(intent: Intent): IBinder? {
-        return super.onBind(intent)
-    }
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.d(BaseApplication.TAG, "Notification service onStartCommandCalled")
-        if (intent != null && intent.action.equals(REBIND_ACTION)) {
-            Log.d(BaseApplication.TAG, "TRYING REBIND SERVICE....")
-            tryReconnectService() //switch on/off component and rebind
-        }
-        //START_STICKY  to order the system to restart your service as soon as possible when it was killed.
-        return START_STICKY
-    }
-    fun tryReconnectService() {
-        toggleNotificationListenerService()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val componentName = ComponentName(
-                applicationContext,
-                VampireCollector::class.java
-            )
-
-            //It say to Notification Manager RE-BIND your service to listen notifications again inmediatelly!
-            requestRebind(componentName)
-        }
-    }
-
-    private fun toggleNotificationListenerService() {
-        val pm = packageManager
-        pm.setComponentEnabledSetting(
-            ComponentName(this, VampireCollector::class.java),
-            PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP
-        )
-        pm.setComponentEnabledSetting(
-            ComponentName(this, VampireCollector::class.java),
-            PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP
-        )
-    }
- */
 
     private fun processNotification(notification: Notification?) {
         Log.d(BaseApplication.TAG, "processNotification")
@@ -196,7 +157,9 @@ class VampireCollector : NotificationListenerService() {
                 )
 
                 GlobalScope.launch {
-                    healthConnectManager.writeGlucose(mgdl.toDouble(), 1)
+                    if (healthConnectManager.hasAllPermissions(healthConnectManager.permissions)) {
+                        healthConnectManager.writeGlucose(mgdl.toDouble(), 1)
+                    }
                 }
             }
         }

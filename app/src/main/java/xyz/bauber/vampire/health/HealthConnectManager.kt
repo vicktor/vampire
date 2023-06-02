@@ -10,6 +10,7 @@ import androidx.activity.result.contract.ActivityResultContract
 import androidx.compose.runtime.mutableStateOf
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
+import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.BloodGlucoseRecord
 import androidx.health.connect.client.records.BloodGlucoseRecord.Companion.RELATION_TO_MEAL_GENERAL
 import androidx.health.connect.client.records.BloodGlucoseRecord.Companion.SPECIMEN_SOURCE_INTERSTITIAL_FLUID
@@ -30,6 +31,10 @@ const val MIN_SUPPORTED_SDK = Build.VERSION_CODES.O_MR1
 class HealthConnectManager(private val context: Context) {
     private val healthConnectClient by lazy { HealthConnectClient.getOrCreate(context) }
 
+    val permissions = setOf(
+        HealthPermission.getWritePermission(BloodGlucoseRecord::class),
+        HealthPermission.getReadPermission(BloodGlucoseRecord::class)
+    )
     var availability = mutableStateOf(HealthConnectAvailability.NOT_SUPPORTED)
         private set
 
