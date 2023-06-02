@@ -42,6 +42,8 @@ From xDrip+
 
 ## Reading data Health Connect
 
+**Currently under development** but works, only a few things need to be finished about permissions 
+
 Take a look at [Health Connect API](https://developer.android.com/guide/health-and-fitness/health-connect)
 
 [Health Connect SDK](https://developer.android.com/guide/health-and-fitness/health-connect/sdk-changes)
@@ -50,6 +52,8 @@ Take a look at [Health Connect API](https://developer.android.com/guide/health-a
 
 
 ## Reading data with ContentProvider
+
+**Currently under development**
 
 Take a look at Google Developers [ContentProvider](https://developer.android.com/reference/android/content/ContentProvider)
 
