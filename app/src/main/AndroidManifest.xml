@@ -62,7 +62,8 @@
             android:authorities="xyz.bauber.vampire.provider"
             android:exported="true" />
 
-        <receiver android:name="xyz.bauber.vampire.services.StartOnBoot">
+        <receiver android:name="xyz.bauber.vampire.services.StartOnBoot"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
