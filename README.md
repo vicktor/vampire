@@ -104,3 +104,5 @@ WebServer -> [NanoHTTPD](https://github.com/NanoHttpd/nanohttpd)
 
 ## Thanks
 Again kudos to awesome xDrip+ Team and all people fighting against diabetes. 
+
+And don't forget to star ☆, fork and contribute!
