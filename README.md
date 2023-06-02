@@ -3,6 +3,14 @@
 # vampire | Delighted to suck your glucoses
 ###### _Give me back my **fucking data**_
 
+## How it works
+
+The application works like a **vampire**, **sucking glucose** data from the permanent notifications that apps have to show the patient their data. 
+
+It will only work with apps that have this notification and update it regularly with the glucose value.
+
+So, what can it do?
+
 Read glucose from notifications and **share** it with **anyone** through internal WebServer and ContentProvider.
 Optionally you can write all information in Google [Health Connect](https://developer.android.com/guide/health-and-fitness/health-connect).
 
