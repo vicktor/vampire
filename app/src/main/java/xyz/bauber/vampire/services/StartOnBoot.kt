@@ -11,7 +11,7 @@ class StartOnBoot : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         if (Intent.ACTION_BOOT_COMPLETED == intent!!.action) {
 
-            if (!isJobServiceOn(context!!)) {
+            //if (!isJobServiceOn(context!!)) {
                 val jobScheduler =
                     context!!.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
 
@@ -23,7 +23,7 @@ class StartOnBoot : BroadcastReceiver() {
                     .build()
 
                 jobScheduler.schedule(jobInfo)
-            }
+            //}
         }
     }
 

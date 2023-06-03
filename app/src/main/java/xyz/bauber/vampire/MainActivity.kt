@@ -88,7 +88,7 @@ class MainActivity : ComponentActivity() {
     }
 
     fun startJobScheduler() {
-        if (!isJobServiceOn()) {
+//        if (!isJobServiceOn()) {
             val jobScheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
 
             val jobInfo = JobInfo.Builder(
@@ -102,7 +102,7 @@ class MainActivity : ComponentActivity() {
                 .build()
 
             jobScheduler.schedule(jobInfo)
-        }
+//        }
     }
 
     fun isJobServiceOn(): Boolean {
