@@ -88,35 +88,19 @@ class MainActivity : ComponentActivity() {
     }
 
     fun startJobScheduler() {
-//        if (!isJobServiceOn()) {
-            val jobScheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-
-            val jobInfo = JobInfo.Builder(
-                BaseApplication.JOB_ID,
-                ComponentName(this, CheckService::class.java)
-            )
-                .setPeriodic(15 * 60 * 1000)
-                .setRequiresCharging(false)
-                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                .setPersisted(true)
-                .build()
-
-            jobScheduler.schedule(jobInfo)
-//        }
-    }
-
-    fun isJobServiceOn(): Boolean {
         val jobScheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-        var hasBeenScheduled = false
 
-        for (jobInfo in jobScheduler.allPendingJobs) {
-            if (jobInfo.id == BaseApplication.JOB_ID) {
-                hasBeenScheduled = true
-                break
-            }
-        }
+        val jobInfo = JobInfo.Builder(
+            BaseApplication.JOB_ID,
+            ComponentName(this, CheckService::class.java)
+        )
+            .setPeriodic(15 * 60 * 1000)
+            .setRequiresCharging(false)
+            .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+            .setPersisted(true)
+            .build()
 
-        return hasBeenScheduled
+        jobScheduler.schedule(jobInfo)
     }
 
     private fun toggleHC(checked: Boolean) {
