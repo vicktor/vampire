@@ -11,7 +11,7 @@ It will only work with apps that have this notification and update it regularly 
 
 So, what can it do?
 
-Read glucose from notifications and **share** it with **anyone** through internal WebServer and ContentProvider.
+Read glucose from notifications and **share** it with **anyone** through internal WebServer, BroadCast to another apps, Health Connect and ContentProvider.
 Optionally you can write all information in Google [Health Connect](https://developer.android.com/guide/health-and-fitness/health-connect).
 
 Based on the great [xDrip+](https://github.com/NightscoutFoundation/xDrip) project without which, **vampire** would not exist.
