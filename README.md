@@ -70,6 +70,9 @@ class VampireReceiver : BroadcastReceiver() {
         val bundle = intent.extras
         val units = bundle?.getString("units")
         val glucose = bundle?.getFloat("glucose")
+        val time = bundle?.getLong("timestamp")
+        val trend = bundle?.getString("trend")
+        val source = bundle?.getString("source")
     }
 }
 ```

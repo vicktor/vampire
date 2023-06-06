@@ -17,6 +17,7 @@ import android.widget.ImageView
 import android.widget.RemoteViews
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
+import androidx.compose.ui.text.toLowerCase
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import xyz.bauber.vampire.BaseApplication
@@ -110,7 +111,7 @@ class VampireCollector : NotificationListenerService() {
         val root = applied.rootView as ViewGroup
         val texts = ArrayList<TextView>()
         getTextViews(texts, root)
-        Log.d(BaseApplication.TAG, "Text views: " + texts.size)
+        Log.d(TAG, "Text views: " + texts.size)
         var matches = 0
         var mgdl = 0
         for (view in texts) {
@@ -120,13 +121,15 @@ class VampireCollector : NotificationListenerService() {
                 val desc =
                     if (tv.contentDescription != null) tv.contentDescription.toString() else ""
                 Log.d(BaseApplication.TAG, "Examining: >$text< : >$desc<")
+                if (text.lowercase().contains("mg")) units = "mgdl"
+                if (text.lowercase().contains("mm")) units = "mmol"
                 val ftext = filterString(text)
                 mgdl = ftext.toInt()
                 if (mgdl > 0) {
                     matches++
                 }
             } catch (e: Exception) {
-                //
+
             }
         }
         if (matches > 1) {
@@ -135,9 +138,10 @@ class VampireCollector : NotificationListenerService() {
             Log.d(BaseApplication.TAG, "Found glucose: $mgdl")
             if (mgdl in 30..450) {
                 Log.e(BaseApplication.TAG, "glucose reading $mgdl")
+                Log.d(TAG, "Source: ${source()}")
+                Log.d(TAG, "UNITS: $units")
                 val healthConnectManager = (application as BaseApplication).healthConnectManager
                 var databaseManager = mContext?.let { DatabaseManager(it) }
-
 
                 val time = tsl()
                 val lastGlucose = databaseManager?.getLastGlucose()
@@ -153,16 +157,16 @@ class VampireCollector : NotificationListenerService() {
                     time,
                     getTimeOffset(),
                     mgdl.toDouble(),
-                    "mgdl",
+                    units,
                     "interstitial",
                     current_trend,
-                    "Dexcom"
+                    source()
                 )
 
                 GlobalScope.launch {
                     if (healthConnectManager.hasAllPermissions(healthConnectManager.permissions)) {
                         Log.d(TAG, "Glucose saved healthConnect")
-                        healthConnectManager.writeGlucose(mgdl.toDouble(), 1)
+                        healthConnectManager.writeGlucose(mgdl.toDouble(), units)
                     }
                 }
 
@@ -171,7 +175,10 @@ class VampireCollector : NotificationListenerService() {
 
                 val bundle = Bundle()
                 bundle.putFloat("glucose", mgdl.toFloat())
-                bundle.putString("units", "mgdl")
+                bundle.putString("units", units)
+                bundle.putString("source", source())
+                bundle.putLong("timestamp", time)
+                bundle.putString("trend", current_trend)
                 SendBroadcast.glucose(bundle, p)
                 Log.d(TAG, "Glucose sent to $p")
 
@@ -299,11 +306,24 @@ class VampireCollector : NotificationListenerService() {
         return System.currentTimeMillis()
     }
 
+    private fun source() : String {
+        return with(lastPackage!!) {
+            when {
+                contains("dexcom") -> "dexcom"
+                contains("camdiab") -> "camaps"
+                contains("medtronic") -> "medtronic"
+                contains("libre") -> "freestylelibre3"
+                else -> ""
+            }
+        }
+    }
     companion object {
-        private val coOptedPackages = HashSet<String>()
 
         var isRunning = false
         var current_trend = "unknown"
+        var units = ""
+
+        private val coOptedPackages = HashSet<String>()
         init {
             coOptedPackages.add("com.dexcom.g6")
             coOptedPackages.add("com.dexcom.g6.region1.mmol")

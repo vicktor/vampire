@@ -101,7 +101,7 @@ class HealthConnectManager(private val context: Context) {
         healthConnectClient.permissionController.revokeAllPermissions()
     }
 
-    suspend fun writeGlucose(value: Double, units: Int) {
+    suspend fun writeGlucose(value: Double, units: String) {
         val time = ZonedDateTime.now().withNano(0)
 
         Log.d(BaseApplication.TAG, "guardando glucosa  "+value)
@@ -109,7 +109,7 @@ class HealthConnectManager(private val context: Context) {
         val record = BloodGlucoseRecord(
             time.toInstant(),
             time.offset,
-            BloodGlucose.milligramsPerDeciliter(value),
+            if (units.equals("mgdl")) BloodGlucose.milligramsPerDeciliter(value) else BloodGlucose.millimolesPerLiter(value),
             SPECIMEN_SOURCE_INTERSTITIAL_FLUID,
             MealType.MEAL_TYPE_UNKNOWN, RELATION_TO_MEAL_GENERAL,
             Metadata()
