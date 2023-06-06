@@ -1,10 +1,13 @@
 package xyz.bauber.vampire
 
+import android.Manifest
+import android.app.Activity
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.PowerManager
@@ -16,7 +19,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.getValue
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.health.connect.client.PermissionController
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -30,6 +36,7 @@ import xyz.bauber.vampire.health.HealthConnectManager
 import xyz.bauber.vampire.services.CheckService
 import xyz.bauber.vampire.services.VampireCollector
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.jvm.internal.CompletedContinuation.context
 
 @OptIn(DelicateCoroutinesApi::class)
 class MainActivity : ComponentActivity() {
@@ -76,6 +83,29 @@ class MainActivity : ComponentActivity() {
 
         val intent = Intent(this, xyz.bauber.vampire.services.WebServerService::class.java)
         startForegroundService(intent)
+
+        val requestPermissionLauncher =
+            registerForActivityResult(
+                ActivityResultContracts.RequestPermission()
+            ) { isGranted: Boolean ->
+                if (isGranted) {
+                    Log.d(BaseApplication.TAG, "permiso concedido")
+                } else {
+                    Log.d(BaseApplication.TAG, "Permiso no concedido")
+                }
+            }
+
+        when {
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED -> {
+            }
+        else -> {
+                requestPermissionLauncher.launch(
+                    Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
 
     }
 

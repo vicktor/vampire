@@ -15,7 +15,6 @@ import xyz.bauber.vampire.webserver.WebServer
 
 class WebServerService : Service() {
 
-
     override fun onBind(intent: Intent): IBinder? {
         return null
     }
@@ -26,10 +25,12 @@ class WebServerService : Service() {
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(getString(R.string.webserver))
             .setContentText(getString(R.string.ws_running))
-
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setSmallIcon(R.drawable.ic_notification)
             .build()
 
         startForeground(NOTIFICATION_ID, notification)
+
 
         if (BaseApplication.server == null) {
             BaseApplication.server = WebServer()
@@ -61,6 +62,6 @@ class WebServerService : Service() {
 
     companion object {
         const val CHANNEL_ID = "VampireWebServerHttpChannel"
-        const val NOTIFICATION_ID = 1
+        const val NOTIFICATION_ID = 19701506
     }
 }
