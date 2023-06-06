@@ -159,6 +159,13 @@ class VampireCollector : NotificationListenerService() {
                     "Dexcom"
                 )
 
+                GlobalScope.launch {
+                    if (healthConnectManager.hasAllPermissions(healthConnectManager.permissions)) {
+                        Log.d(TAG, "Glucose saved healthConnect")
+                        healthConnectManager.writeGlucose(mgdl.toDouble(), 1)
+                    }
+                }
+
                 val sharedPreferences = getSharedPreferences("vampire", Context.MODE_PRIVATE)
                 val p = sharedPreferences.getString("shareto", null)
 
@@ -168,11 +175,6 @@ class VampireCollector : NotificationListenerService() {
                 SendBroadcast.glucose(bundle, p)
                 Log.d(TAG, "Glucose sent to $p")
 
-                GlobalScope.launch {
-                    if (healthConnectManager.hasAllPermissions(healthConnectManager.permissions)) {
-                        healthConnectManager.writeGlucose(mgdl.toDouble(), 1)
-                    }
-                }
             }
         }
     }

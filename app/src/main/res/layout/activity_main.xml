@@ -104,7 +104,10 @@
         app:layout_constraintBottom_toTopOf="@+id/bPermission"
         app:layout_constraintEnd_toStartOf="@+id/save"
         app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        android:focusableInTouchMode="true">
+        <requestFocus />
+    </EditText>
 
     <ImageView
         android:id="@+id/save"

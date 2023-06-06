@@ -7,9 +7,9 @@ object SendBroadcast {
 
     fun glucose( bundle: Bundle?, packageName: String?) {
 
-        Intent(SEND_GLUCOSE).also { intent ->
+        Intent().also { intent ->
             intent.action = SEND_GLUCOSE
-            if (packageName != null) intent.setPackage(packageName)
+            if (packageName != null) intent.setPackage(packageName.trim())
             if (bundle != null) intent.putExtras(bundle)
             BaseApplication.instance.sendBroadcast(intent)
         }
