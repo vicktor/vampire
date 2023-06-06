@@ -317,6 +317,7 @@ class VampireCollector : NotificationListenerService() {
             }
         }
     }
+
     companion object {
 
         var isRunning = false

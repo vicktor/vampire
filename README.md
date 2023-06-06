@@ -46,6 +46,7 @@ From xDrip+
     coOptedPackages.add("com.medtronic.diabetes.guardian")
     coOptedPackages.add("com.medtronic.diabetes.minimedmobile.eu")
     coOptedPackages.add("com.medtronic.diabetes.minimedmobile.us")
+    coOptedPackages.add("com.freestylelibre3.app")
 ```
 
 ## Reading via Intent BroadCast
