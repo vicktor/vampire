@@ -11,4 +11,6 @@
     <string name="mgdl">mg/dL</string>
     <string name="mmol">mmol/L</string>
     <string name="hc_notavailable">Health Connect no està disponible</string>
+    <string name="webserver">Servidor Web</string>
+    <string name="ws_running">El servidor web s\'esta executant…</string>
 </resources>

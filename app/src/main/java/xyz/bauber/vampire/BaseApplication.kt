@@ -8,6 +8,7 @@ import android.content.ComponentName
 import android.content.Context
 import xyz.bauber.vampire.health.HealthConnectManager
 import xyz.bauber.vampire.services.CheckService
+import xyz.bauber.vampire.webserver.WebServer
 
 class BaseApplication : Application() {
     val healthConnectManager by lazy {
@@ -26,6 +27,7 @@ class BaseApplication : Application() {
         const val TAG = "vampire"
         const val JOB_ID = 1970
         var serviceChecker: ComponentName? = null
+        var server: WebServer? = null
 
         lateinit var instance: BaseApplication
             private set

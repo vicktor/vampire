@@ -29,17 +29,13 @@ import xyz.bauber.vampire.health.HealthConnectAvailability
 import xyz.bauber.vampire.health.HealthConnectManager
 import xyz.bauber.vampire.services.CheckService
 import xyz.bauber.vampire.services.VampireCollector
-import xyz.bauber.vampire.webserver.WebServer
 import java.util.concurrent.TimeUnit
 
 @OptIn(DelicateCoroutinesApi::class)
 class MainActivity : ComponentActivity() {
 
-    private lateinit var server: WebServer
     private lateinit var healthConnectManager: HealthConnectManager
-    val HEALTH_CONNECT_RESPONSE_ID = 10000
-
-
+    private val HEALTH_CONNECT_RESPONSE_ID = 10000
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,14 +72,10 @@ class MainActivity : ComponentActivity() {
 
         checkBattery()
 
-        server = WebServer()
-        try {
-            server.start()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
         startJobScheduler()
+
+        val intent = Intent(this, xyz.bauber.vampire.services.WebServerService::class.java)
+        startForegroundService(intent)
 
     }
 
@@ -147,8 +139,6 @@ class MainActivity : ComponentActivity() {
             val name = resources.getString(R.string.app_name)
             Toast.makeText(applicationContext, "Battery optimization -> All apps -> $name -> Don't optimize", Toast.LENGTH_LONG).show()
 
-            //val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
-            //startActivity(intent)
             val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
             intent.data = Uri.parse("package:$packageName")
             startActivity(intent)
@@ -201,12 +191,6 @@ class MainActivity : ComponentActivity() {
         }
 
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        server.stop()
-    }
-
 
     fun requestPermissionsActivityContract(): ActivityResultContract<Set<String>, Set<String>> {
         val healthConnectManager = (application as BaseApplication).healthConnectManager

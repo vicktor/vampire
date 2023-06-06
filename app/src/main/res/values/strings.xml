@@ -10,4 +10,6 @@
     <string name="mgdl">mg/dL</string>
     <string name="mmol">mmol/L</string>
     <string name="hc_notavailable">Health Connect is not available</string>
+    <string name="webserver">WebServer</string>
+    <string name="ws_running">WebServer running…</string>
 </resources>
