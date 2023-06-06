@@ -67,11 +67,6 @@
             android:foregroundServiceType="dataSync"
             android:exported="true"/>
 
-        <provider
-            android:name="xyz.bauber.vampire.provider.GlucoseProvider"
-            android:authorities="xyz.bauber.vampire.provider"
-            android:exported="true" />
-
         <receiver android:name="xyz.bauber.vampire.services.StartOnBoot"
             android:exported="true">
             <intent-filter>

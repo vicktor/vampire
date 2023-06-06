@@ -90,9 +90,7 @@ Take a look at [Health Connect API](https://developer.android.com/guide/health-a
 
 ## Reading data with ContentProvider
 
-**Currently under development**
-
-Take a look at Google Developers [ContentProvider](https://developer.android.com/reference/android/content/ContentProvider)
+**Removed**
 
 ## Reading data with WebServer
 
