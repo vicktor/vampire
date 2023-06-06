@@ -48,6 +48,35 @@ From xDrip+
     coOptedPackages.add("com.medtronic.diabetes.minimedmobile.us")
 ```
 
+## Reading via Intent BroadCast
+
+Declare something similar in your AndroidManifest
+
+```
+<receiver android:name=".receivers.VampireReceiver"
+    android:enabled="true"
+    android:exported="true">
+    <intent-filter>
+        <action android:name="xyz.bauber.vampire.SEND_GLUCOSE" />
+    </intent-filter>
+</receiver>
+```
+
+Create your BroadCast Receiver
+
+```
+class VampireReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        val bundle = intent.extras
+        val units = bundle?.getString("units")
+        val glucose = bundle?.getFloat("glucose")
+    }
+}
+```
+
+Remember to write destination PackageName
+
+
 ## Reading data Health Connect
 
 **Currently under development** but works, only a few things need to be finished about permissions 

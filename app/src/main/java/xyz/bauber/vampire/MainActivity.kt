@@ -13,7 +13,11 @@ import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
 import android.util.Log
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
+import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
@@ -36,7 +40,6 @@ import xyz.bauber.vampire.health.HealthConnectManager
 import xyz.bauber.vampire.services.CheckService
 import xyz.bauber.vampire.services.VampireCollector
 import java.util.concurrent.TimeUnit
-import kotlin.coroutines.jvm.internal.CompletedContinuation.context
 
 @OptIn(DelicateCoroutinesApi::class)
 class MainActivity : ComponentActivity() {
@@ -66,6 +69,19 @@ class MainActivity : ComponentActivity() {
         findViewById<Switch>(R.id.hconnect).setOnClickListener {
             toggleHC(findViewById<Switch>(R.id.hconnect).isChecked)
         }
+
+        val packagename = findViewById<EditText>(R.id.packname)
+        val sp = getSharedPreferences("vampire", Context.MODE_PRIVATE)
+        packagename.setText(sp.getString("shareto", ""))
+
+        findViewById<ImageView>(R.id.save).setOnClickListener {
+            val editor = sp.edit()
+            editor.putString("shareto", packagename.text.toString())
+            editor.apply()
+            Toast.makeText(this, "packagename saved!", Toast.LENGTH_LONG).show()
+            hideKeyboard(this)
+        }
+
 
         val cn = ComponentName(this, VampireCollector::class.java)
         val flat = Settings.Secure.getString(
@@ -108,6 +124,14 @@ class MainActivity : ComponentActivity() {
         }
 
     }
+
+    fun hideKeyboard(activity: Activity) {
+        val inputMethodManager = activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        // Verificar si no hay vista enfocada actualmente
+        val view = activity.currentFocus ?: View(activity)
+        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
 
     fun startJobScheduler() {
         val jobScheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler

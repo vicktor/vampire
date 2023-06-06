@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Bundle
 import android.os.IBinder
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
@@ -19,6 +20,8 @@ import androidx.annotation.VisibleForTesting
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import xyz.bauber.vampire.BaseApplication
+import xyz.bauber.vampire.BaseApplication.Companion.TAG
+import xyz.bauber.vampire.SendBroadcast
 import xyz.bauber.vampire.database.DatabaseManager
 import xyz.bauber.vampire.database.GlucoseRecord
 import java.util.Calendar
@@ -155,6 +158,15 @@ class VampireCollector : NotificationListenerService() {
                     current_trend,
                     "Dexcom"
                 )
+
+                val sharedPreferences = getSharedPreferences("vampire", Context.MODE_PRIVATE)
+                val p = sharedPreferences.getString("shareto", null)
+
+                val bundle = Bundle()
+                bundle.putFloat("glucose", mgdl.toFloat())
+                bundle.putString("units", "mgdl")
+                SendBroadcast.glucose(bundle, p)
+                Log.d(TAG, "Glucose sent to $p")
 
                 GlobalScope.launch {
                     if (healthConnectManager.hasAllPermissions(healthConnectManager.permissions)) {
