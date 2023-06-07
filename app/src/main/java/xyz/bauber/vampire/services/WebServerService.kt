@@ -24,7 +24,7 @@ class WebServerService : Service() {
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(getString(R.string.webserver))
-            .setContentText(getString(R.string.ws_running))
+            .setContentText("$URL:$PORT")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setSmallIcon(R.drawable.ic_notification)
             .build()
@@ -49,7 +49,7 @@ class WebServerService : Service() {
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = getString(R.string.webserver)
-            val descriptionText = getString(R.string.ws_running)
+            val descriptionText = "$URL:$PORT"
             val importance = NotificationManager.IMPORTANCE_DEFAULT
             val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
                 description = descriptionText
@@ -63,5 +63,7 @@ class WebServerService : Service() {
     companion object {
         const val CHANNEL_ID = "VampireWebServerHttpChannel"
         const val NOTIFICATION_ID = 19701506
+        const val PORT = 5566
+        const val URL = "http://localhost"
     }
 }

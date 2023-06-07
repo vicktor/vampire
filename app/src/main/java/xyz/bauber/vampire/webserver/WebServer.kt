@@ -4,8 +4,10 @@ import com.google.gson.Gson
 import xyz.bauber.vampire.BaseApplication
 import xyz.bauber.vampire.database.DatabaseManager
 import fi.iki.elonen.NanoHTTPD
+import xyz.bauber.vampire.services.WebServerService.Companion.PORT
 
-class WebServer : NanoHTTPD(5566) {
+
+class WebServer : NanoHTTPD(PORT) {
     override fun serve(session: IHTTPSession): Response {
         val mimeType = "text/json"
 
