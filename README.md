@@ -123,13 +123,17 @@ Code needs to be improved and unused parts removed
 
 It would be very interesting if someone can test with FreeStyleLibre, right now I don't have any sensor to test, the package name would be com.freestylelibre3.app, I add it to VampireCollector code
 
-
 ## Bugs
 Sometimes the service stops and does not continue to collect data. 
 If anyone knows how to fix this, open an issue or make a pull request.
 
 ## Contributing
-Of course, collaborations and pull requests are welcome. 
+Of course, contributions are what make the open source community such an amazing place to learn, inspire, and create. 
+
+If you have a suggestion that would make **Vampire** better, please fork the repo and create a pull request. 
+
+Any contributions you make are greatly appreciated.
+
 
 ## Credits
 Icon -> [icon-icons.com](https://icon-icons.com/icon/vampire/2710)
