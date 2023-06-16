@@ -127,13 +127,18 @@ It would be very interesting if someone can test with FreeStyleLibre, right now 
 Sometimes the service stops and does not continue to collect data. 
 If anyone knows how to fix this, open an issue or make a pull request.
 
+## Example of integration
+[SocialDiabetes](https://socialdiabetes.com) App working with **Vampire** in real-time via Intent BroadCast
+
+![SocialDiabetes](https://github.com/vicktor/vampire/assets/382114/a861c341-470f-4e59-b273-019dbfd441e5)
+
+
 ## Contributing
 Of course, contributions are what make the open source community such an amazing place to learn, inspire, and create. 
 
 If you have a suggestion that would make **Vampire** better, please fork the repo and create a pull request. 
 
 Any contributions you make are greatly appreciated.
-
 
 ## Credits
 Icon -> [icon-icons.com](https://icon-icons.com/icon/vampire/2710)
